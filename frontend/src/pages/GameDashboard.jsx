@@ -8,6 +8,7 @@ import Analyzers from '../components/Analyzers';
 import Helper from '../components/Helper';
 import Spells from '../components/Spells';
 import HuntsGrid from '../components/HuntsGrid';
+import { HUNTS_GRID } from '../config/huntsConfig';
 import BossBar from '../components/BossBar';
 import Icon, { MaskIcon } from '../components/Icon';
 
@@ -54,7 +55,7 @@ const VOCATION_ICONS = {
 
 export default function GameDashboard({ character, onUpdate }) {
   const [char, setChar] = useState(character);
-  const [zones, setZones] = useState([]);
+  const [zones, setZones] = useState(HUNTS_GRID);
   const [instance, setInstance] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showBossShop, setShowBossShop] = useState(false);
@@ -64,10 +65,13 @@ export default function GameDashboard({ character, onUpdate }) {
   const [showAnalyzers, setShowAnalyzers] = useState(true);
   const [bossSkipCooldown, setBossSkipCooldown] = useState(0);
 
-  // Carregar zonas de caçada
+  // Zonas de caçada carregadas localmente (huntsConfig)
+  // Se a API estiver disponível, pode ser sincronizada futuramente.
+  /*
   useEffect(() => {
     api.getZones().then(setZones).catch(console.error);
   }, []);
+  */
 
   const [helperSystem, setHelperSystem] = useState(null);
 
