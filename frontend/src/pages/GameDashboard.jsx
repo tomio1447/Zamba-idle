@@ -7,6 +7,7 @@ import Analyzers from '../components/Analyzers';
 import Helper from '../components/Helper';
 import Spells from '../components/Spells';
 import HuntsGrid from '../components/HuntsGrid';
+import BossBar from '../components/BossBar';
 
 const VOCATION_ICONS = {
   KNIGHT: '⚔️',
@@ -27,6 +28,7 @@ export default function GameDashboard({ character, onUpdate }) {
   const [spritesLoaded, setSpritesLoaded] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showAnalyzers, setShowAnalyzers] = useState(true);
+  const [bossSkipCooldown, setBossSkipCooldown] = useState(0);
 
   // Carregar zonas de caçada
   useEffect(() => {
@@ -110,6 +112,26 @@ export default function GameDashboard({ character, onUpdate }) {
   const handleSpritesLoaded = (loaded) => {
     setSpritesLoaded(loaded);
     setShowSpriteUploader(false);
+  };
+
+  // Pular Boss
+  const handleSkipBoss = () => {
+    if (bossSkipCooldown > 0) return;
+    
+    // Aplicar penalidade e voltar para cidade
+    handleFlee();
+    
+    // Iniciar cooldown de 20 segundos
+    setBossSkipCooldown(20000);
+    const interval = setInterval(() => {
+      setBossSkipCooldown(prev => {
+        if (prev <= 1000) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
   };
 
   const formatTime = (seconds) => {
@@ -242,6 +264,16 @@ export default function GameDashboard({ character, onUpdate }) {
                   )}
                 </div>
               </div>
+
+              {/* Boss Bar (se for wave de boss) */}
+              {instance.isBossWave && instance.currentBoss && (
+                <BossBar 
+                  boss={instance.monsters.find(m => m.isBoss)}
+                  onSkipBoss={handleSkipBoss}
+                  canSkip={bossSkipCooldown === 0}
+                  cooldownRemaining={bossSkipCooldown}
+                />
+              )}
 
               {/* Canvas do Jogo com Sprites do Tibia */}
               <TibiaGameCanvas 

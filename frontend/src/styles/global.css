@@ -2490,6 +2490,104 @@ body {
   color: var(--text-secondary);
 }
 
+/* Boss Bar */
+.bossbar-frame {
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(255, 0, 0, 0.1));
+  border: 2px solid #ff0000;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  animation: boss-pulse 2s infinite;
+}
+
+@keyframes boss-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+}
+
+.bossbar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bossbar-icon {
+  font-size: 1.5rem;
+}
+
+.bossbar-name {
+  color: #FFD700;
+  font-weight: bold;
+  font-size: 1.1rem;
+  flex: 1;
+}
+
+.bossbar-label {
+  background: #ff0000;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.bossbar-container {
+  position: relative;
+  height: 24px;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.bossbar-hp {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 12px;
+}
+
+.bossbar-hp-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.bossbar-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-skip-boss {
+  background: linear-gradient(135deg, #ff6600, #ff0000);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-skip-boss:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.btn-skip-boss:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-skip-boss.cooldown {
+  background: #666;
+}
+
 /* Inventory Panel */
 .inventory-panel {
   display: flex;
