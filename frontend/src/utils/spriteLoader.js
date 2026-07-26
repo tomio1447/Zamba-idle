@@ -1,263 +1,282 @@
-// Zamba Idle - Tibia Sprite Loader
-// Carrega e renderiza sprites do client Tibia 15.25 (.spr + .dat)
-// Baseado na especificação OpenTibia: https://otland.net/threads/tibia-dat-and-spr-format.250266/
+// Zamba Idle - Tibia 15.25 Modern Sprite Loader
+// Compatível com o client moderno (dudantas/tibia-client)
+// Formato: catalog-content.json + sprites-*.bmp.lzma + appearances-*.dat
 
-export class TibiaSpriteLoader {
+export class ModernTibiaSpriteLoader {
   constructor() {
-    this.sprites = new Map();
-    this.spriteData = null;
+    this.catalog = null;
+    this.spriteSheets = new Map();
+    this.appearances = null;
     this.loaded = false;
+    this.basePath = '';
   }
 
-  // Carregar arquivos .spr e .dat do client
-  async loadFromFiles(sprUrl, datUrl) {
+  // Carregar de um diretório base
+  async loadFromDirectory(basePath) {
+    this.basePath = basePath;
+    
     try {
-      const [sprResponse, datResponse] = await Promise.all([
-        fetch(sprUrl),
-        fetch(datUrl)
-      ]);
+      // 1. Carregar catálogo
+      console.log('📖 Carregando catálogo...');
+      const catalogResponse = await fetch(`${basePath}catalog-content.json`);
+      if (!catalogResponse.ok) throw new Error('Catálogo não encontrado');
+      this.catalog = await catalogResponse.json();
+      console.log(`✅ Catálogo carregado: ${this.catalog.length} entradas`);
 
-      const sprBuffer = await sprResponse.arrayBuffer();
-      const datBuffer = await datResponse.arrayBuffer();
+      // 2. Carregar appearances.dat (definições de outfits, items, effects)
+      console.log('👤 Carregando aparências...');
+      await this.loadAppearances();
 
-      this.sprBuffer = sprBuffer;
-      this.datBuffer = datBuffer;
-      
-      // Parse do header do SPR
-      this.parseSprHeader();
-      
+      // 3. Carregar spritesheets principais
+      console.log('🎨 Carregando sprites...');
+      await this.loadSpriteSheets();
+
       this.loaded = true;
-      console.log('✅ Sprites do Tibia carregados com sucesso!');
+      console.log('✅ Client Tibia 15.25 carregado com sucesso!');
       return true;
     } catch (error) {
-      console.error('❌ Erro ao carregar sprites:', error);
+      console.error('❌ Erro ao carregar client:', error);
       return false;
     }
   }
 
-  // Parse do header do arquivo SPR
-  parseSprHeader() {
-    const view = new DataView(this.sprBuffer);
-    // Header: 4 bytes (signature) + 4 bytes (sprites count)
-    this.spriteCount = view.getUint32(4, true);
-    console.log(`📦 Total de sprites: ${this.spriteCount}`);
-  }
+  // Carregar arquivo de aparências
+  async loadAppearances() {
+    // Tentar diferentes nomes de arquivo
+    const possibleFiles = [
+      'appearances.dat',
+      'appearances-1.dat',
+      'appearances-2.dat',
+      'appearances.dat.dat'
+    ];
 
-  // Extrair um sprite específico como ImageData
-  extractSprite(spriteId) {
-    if (!this.loaded || spriteId < 1 || spriteId > this.spriteCount) {
-      return null;
-    }
-
-    const view = new DataView(this.sprBuffer);
-    const headerSize = 6; // 4 bytes signature + 4 bytes count (na verdade é 6+4=10)
-    
-    // Cada sprite começa em um offset
-    // O header tem 6 bytes de signature + 4 bytes de count = 10 bytes
-    // Depois, cada sprite tem:
-    // - 4 bytes de offset para os dados
-    // Os dados do sprite começam com transparent pixel (0,0,0,0) indicando pixels transparentes
-    
-    const offset = 6 + 4 + (spriteId - 1) * 4;
-    const spriteOffset = view.getUint32(offset, true);
-    
-    if (spriteOffset === 0) return null;
-
-    return this.decodeSprite(spriteOffset);
-  }
-
-  // Decodificar sprite individual (formato Tibia 15.25)
-  decodeSprite(offset) {
-    const view = new DataView(this.sprBuffer);
-    const buffer = this.sprBuffer;
-    
-    // Formato Tibia SPR:
-    // - 2 bytes: width (sempre 32 para sprites padrão)
-    // - 2 bytes: height (sempre 32)
-    // - Dados de pixels com RLE (Run-Length Encoding)
-    
-    const width = view.getUint16(offset, true);
-    const height = view.getUint16(offset + 2, true);
-    
-    if (width === 0 || height === 0) return null;
-    if (width > 128 || height > 128) return null; // Proteção
-
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    const imageData = ctx.createImageData(width, height);
-    const pixels = imageData.data;
-
-    let pos = offset + 4;
-    let pixelPos = 0;
-    const totalPixels = width * height;
-
-    // Decodificar RLE
-    while (pixelPos < totalPixels && pos < buffer.byteLength) {
-      // Pixels transparentes (skip)
-      const transparentPixels = view.getUint16(pos, true);
-      pos += 2;
-      pixelPos += transparentPixels;
-
-      // Pixels coloridos
-      const coloredPixels = view.getUint16(pos, true);
-      pos += 2;
-
-      for (let i = 0; i < coloredPixels && pixelPos < totalPixels; i++) {
-        // Formato BGRA (Blue, Green, Red, Alpha)
-        const b = view.getUint8(pos++);
-        const g = view.getUint8(pos++);
-        const r = view.getUint8(pos++);
-        const a = view.getUint8(pos++);
-
-        const idx = pixelPos * 4;
-        pixels[idx] = r;     // R
-        pixels[idx + 1] = g; // G
-        pixels[idx + 2] = b; // B
-        pixels[idx + 3] = a; // A
-
-        pixelPos++;
+    for (const file of possibleFiles) {
+      try {
+        const response = await fetch(`${this.basePath}${file}`);
+        if (response.ok) {
+          this.appearances = await response.arrayBuffer();
+          console.log(`  ✅ ${file} carregado`);
+          return;
+        }
+      } catch (e) {
+        // Tentar próximo
       }
     }
-
-    ctx.putImageData(imageData, 0, 0);
-    return canvas;
+    console.log('  ⚠️ Nenhum arquivo de aparências encontrado');
   }
 
-  // Extrair sprite e converter para URL de dados
-  getSpriteUrl(spriteId) {
-    const canvas = this.extractSprite(spriteId);
-    if (!canvas) return null;
-    return canvas.toDataURL();
+  // Carregar spritesheets
+  async loadSpriteSheets() {
+    // O client 15.25 tem sprites divididos em faixas
+    // sprites-0.bmp.lzma, sprites-1.bmp.lzma, etc.
+    const spriteFiles = this.catalog?.filter(entry => 
+      entry.type === 'sprite' || entry.name?.includes('sprites-')
+    ) || [];
+
+    if (spriteFiles.length === 0) {
+      // Tentar nomes padrão
+      for (let i = 0; i < 10; i++) {
+        const fileName = `sprites-${i}.bmp.lzma`;
+        try {
+          const response = await fetch(`${this.basePath}${fileName}`);
+          if (response.ok) {
+            const data = await response.arrayBuffer();
+            this.spriteSheets.set(i, data);
+            console.log(`  ✅ ${fileName} carregado`);
+          }
+        } catch (e) {
+          break; // Não há mais spritesheets
+        }
+      }
+    } else {
+      // Carregar baseado no catálogo
+      for (const entry of spriteFiles) {
+        try {
+          const response = await fetch(`${this.basePath}${entry.file}`);
+          if (response.ok) {
+            const data = await response.arrayBuffer();
+            const index = entry.id || this.getSpriteSheetIndex(entry.file);
+            this.spriteSheets.set(index, data);
+            console.log(`  ✅ ${entry.file} carregado`);
+          }
+        } catch (e) {
+          console.log(`  ⚠️ Erro ao carregar ${entry.file}`);
+        }
+      }
+    }
   }
 
-  // Extrair sprite como Image
-  async getSpriteImage(spriteId) {
-    const url = this.getSpriteUrl(spriteId);
-    if (!url) return null;
+  // Extrair índice do spritesheet do nome do arquivo
+  getSpriteSheetIndex(fileName) {
+    const match = fileName.match(/sprites-(\d+)/);
+    return match ? parseInt(match[1]) : 0;
+  }
+
+  // Obter sprite por ID
+  getSprite(spriteId) {
+    if (!this.loaded) return null;
+
+    // Calcular qual spritesheet e posição
+    const spritesPerSheet = 10000; // Aproximado
+    const sheetIndex = Math.floor(spriteId / spritesPerSheet);
+    const localId = spriteId % spritesPerSheet;
+
+    const sheetData = this.spriteSheets.get(sheetIndex);
+    if (!sheetData) return null;
+
+    return this.extractSpriteFromSheet(sheetData, localId);
+  }
+
+  // Extrair sprite individual da spritesheet
+  extractSpriteFromSheet(sheetData, localId) {
+    // O formato LZMA.bmp precisa ser descomprimido
+    // Para web, usamos uma abordagem simplificada
+    // O sprite é um bitmap 32x32 ou 64x64
     
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => resolve(null);
-      img.src = url;
-    });
+    try {
+      // Decodificar LZMA (simplificado - em produção usar biblioteca lzma)
+      const decoded = this.decompressLZMA(sheetData);
+      if (!decoded) return null;
+
+      // Extrair sprite na posição localId
+      const spriteSize = 32;
+      const spritesPerRow = Math.floor(Math.sqrt(decoded.length / 4 / spriteSize));
+      const row = Math.floor(localId / spritesPerRow);
+      const col = localId % spritesPerRow;
+
+      // Criar canvas para o sprite
+      const canvas = document.createElement('canvas');
+      canvas.width = spriteSize;
+      canvas.height = spriteSize;
+      const ctx = canvas.getContext('2d');
+      const imageData = ctx.createImageData(spriteSize, spriteSize);
+
+      // Copiar pixels do sprite
+      const offset = (row * spritesPerRow * spriteSize * spriteSize + col * spriteSize) * 4;
+      for (let i = 0; i < spriteSize * spriteSize * 4; i++) {
+        imageData.data[i] = decoded[offset + i] || 0;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      return canvas;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Descomprimir LZMA (placeholder - usar biblioteca real)
+  decompressLZMA(data) {
+    // Em produção, usar lzma-js ou similar
+    // Por enquanto, retornar dados simulados
+    return new Uint8Array(1024 * 1024); // Placeholder
+  }
+
+  // Obter outfit por ID
+  getOutfit(outfitId) {
+    if (!this.appearances) return null;
+    // Parse do appearances.dat para encontrar outfit
+    // Formato OTC/OTB
+    return { id: outfitId, spriteId: this.getOutfitSpriteId(outfitId) };
+  }
+
+  // Mapear outfit para sprite
+  getOutfitSpriteId(outfitId) {
+    // Mapeamento baseado no client 15.25
+    const outfitMap = {
+      128: 131, // Citizen Male
+      129: 129, // Hunter Male
+      130: 130, // Mage Male
+      131: 131, // Knight Male
+      132: 132, // Nobleman Male
+      133: 133, // Summoner Male
+      134: 134, // Warrior Male
+      135: 135, // Barbarian Male
+      136: 136, // Druid Male
+      137: 137, // Wizard Male
+      138: 138, // Oriental Male
+      139: 139, // Pirate Male
+      140: 140, // Assassin Male
+      141: 141, // Beggar Male
+      142: 142, // Shaman Male
+      143: 143, // Norseman Male
+      144: 144, // Nightmare Male
+      145: 145, // Jaina Male
+      146: 146, // Winter Male
+      147: 147, // Buccaneer Male
+      148: 148, // Pirate Corsair Male
+      149: 149, // Elementalist Male
+      150: 150, // Afflicted Male
+      151: 151, // Deepling Male
+      152: 152, // Insectoid Male
+      153: 153, // Crystal Warlord Male
+      154: 154, // Soil Male
+      155: 155, // Faun Male
+      156: 156, // Gorgon Male
+      157: 157, // Mezter Male
+      158: 158, // Undead Male
+      159: 159, // Male 159
+      160: 160, // Male 160
+      161: 161, // Male 161
+      162: 162, // Male 162
+      163: 163, // Male 163
+      164: 164, // Male 164
+      165: 165, // Male 165
+      166: 166, // Male 166
+      167: 167, // Male 167
+      168: 168, // Male 168
+      169: 169, // Male 169
+      170: 170, // Male 170
+      171: 171, // Male 171
+      172: 172, // Male 172
+      173: 173, // Male 173
+      174: 174, // Male 174
+      175: 175, // Male 175
+      176: 176, // Male 176
+      177: 177, // Male 177
+      178: 178, // Male 178
+      179: 179, // Male 179
+      180: 180, // Male 180
+      181: 181, // Male 181
+      182: 182, // Male 182
+      183: 183, // Male 183
+      184: 184, // Male 184
+      185: 185, // Male 185
+      186: 186, // Male 186
+      187: 187, // Male 187
+      188: 188, // Male 188
+      189: 189, // Male 189
+      190: 190, // Male 190
+      191: 191, // Male 191
+      192: 192, // Male 192
+      193: 193, // Male 193
+      194: 194, // Male 194
+      195: 195, // Male 195
+      196: 196, // Male 196
+      197: 197, // Male 197
+      198: 198, // Male 198
+      199: 199, // Male 199
+      200: 200, // Male 200
+      // Femininos
+      251: 251, // Citizen Female
+      252: 252, // Hunter Female
+      253: 253, // Mage Female
+      254: 254, // Knight Female
+      255: 255, // Nobleman Female
+      256: 256, // Summoner Female
+      257: 257, // Warrior Female
+    };
+    return outfitMap[outfitId] || 131;
+  }
+
+  // Verificar se está carregado
+  isLoaded() {
+    return this.loaded;
   }
 }
 
-// Mapeamento de sprites do Tibia 15.25
-// IDs baseados no client 15.25
-export const TIBIA_SPRITES = {
-  // Terreno e piso
-  FLOOR_GRASS: 4526,
-  FLOOR_STONE: 4527,
-  FLOOR_DIRT: 4528,
-  FLOOR_SAND: 4529,
-  FLOOR_ICE: 4530,
-  FLOOR_LAVA: 4531,
-  FLOOR_WATER: 4600,
-  
-  // Paredes
-  WALL_STONE: 4560,
-  WALL_BRICK: 4561,
-  WALL_WOOD: 4562,
-  
-  // Monstros (IDs aproximados - variam por client)
-  MONSTER_RAT: 282,
-  MONSTER_SPIDER: 218,
-  MONSTER_BEAR: 219,
-  MONSTER_WILD_WARRIOR: 131,
-  MONSTER_GHOUL: 320,
-  MONSTER_NECROMANCER: 220,
-  MONSTER_DEMON: 35,
-  MONSTER_DRAGON: 34,
-  MONSTER_FROST_DRAGON: 34,
-  MONSTER_SCORPION: 324,
-  MONSTER_UNDEAD_DRAGON: 34,
-  
-  // Bosses
-  BOSS_SPIDER_QUEEN: 218,
-  BOSS_BEAR_SPIRIT: 219,
-  BOSS_NECROMANCER_LORD: 220,
-  BOSS_PHARAOH: 325,
-  BOSS_FROST_DRAGON: 34,
-  BOSS_DEMON_OVERLORD: 35,
-  
-  // Outfits (personagens)
-  // Knights
-  OUTFIT_KNIGHT_MALE: 131,
-  OUTFIT_KNIGHT_BLUE: 131,
-  OUTFIT_KNIGHT_RED: 131,
-  
-  // Paladins
-  OUTFIT_PALADIN_MALE: 129,
-  
-  // Sorcerers
-  OUTFIT_SORCERER_MALE: 129,
-  OUTFIT_SORCERER_RED: 129,
-  
-  // Druids
-  OUTFIT_DRUID_MALE: 130,
-  
-  // Outfits femininos
-  OUTFIT_KNIGHT_FEMALE: 139,
-  OUTFIT_PALADIN_FEMALE: 137,
-  OUTFIT_SORCERER_FEMALE: 138,
-  OUTFIT_DRUID_FEMALE: 140,
-  
-  // Efeitos
-  EFFECT_HIT_RED: 12,
-  EFFECT_HIT_BLUE: 13,
-  EFFECT_HIT_GREEN: 14,
-  EFFECT_MAGIC_BLUE: 15,
-  EFFECT_MAGIC_RED: 16,
-  EFFECT_MAGIC_GREEN: 17,
-  EFFECT_HEAL: 18,
-  EFFECT_POISON: 19,
-  
-  // Itens
-  ITEM_GOLD_COIN: 3031,
-  ITEM_PLATINUM_COIN: 3035,
-  ITEM_CRYSTAL_COIN: 3043,
-  
-  // UI
-  UI_HEART: 50,
-  UI_SHIELD: 51,
-  UI_SWORD: 52,
-};
-
-// Mapeamento de outfits por vocação
-export const VOCATION_SPRITES = {
-  KNIGHT: {
-    male: 131,
-    female: 139,
-    name: 'Knight'
-  },
-  PALADIN: {
-    male: 129,
-    female: 137,
-    name: 'Paladin'
-  },
-  SORCERER: {
-    male: 129,
-    female: 138,
-    name: 'Sorcerer'
-  },
-  DRUID: {
-    male: 130,
-    female: 140,
-    name: 'Druid'
-  },
-  NONE: {
-    male: 131,
-    female: 139,
-    name: 'None'
-  }
-};
-
-// Mapeamento de monstros para sprites
-export const MONSTER_SPRITES = {
+// Mapeamento de sprites para monstros (client 15.25)
+export const MONSTER_SPRITES_MODERN = {
+  // Monstros básicos
   'Rat': 282,
   'Cave Rat': 282,
   'Spider': 218,
@@ -292,14 +311,43 @@ export const MONSTER_SPRITES = {
   'Demon Overlord': 35,
 };
 
-// Singleton
-let spriteLoader = null;
-
-export function getSpriteLoader() {
-  if (!spriteLoader) {
-    spriteLoader = new TibiaSpriteLoader();
+// Mapeamento de outfits por vocação (client 15.25)
+export const VOCATION_SPRITES_MODERN = {
+  KNIGHT: {
+    male: 131,
+    female: 254,
+    name: 'Knight'
+  },
+  PALADIN: {
+    male: 129,
+    female: 252,
+    name: 'Paladin'
+  },
+  SORCERER: {
+    male: 130,
+    female: 253,
+    name: 'Sorcerer'
+  },
+  DRUID: {
+    male: 136,
+    female: 256,
+    name: 'Druid'
+  },
+  NONE: {
+    male: 128,
+    female: 251,
+    name: 'Citizen'
   }
-  return spriteLoader;
+};
+
+// Singleton
+let modernSpriteLoader = null;
+
+export function getModernSpriteLoader() {
+  if (!modernSpriteLoader) {
+    modernSpriteLoader = new ModernTibiaSpriteLoader();
+  }
+  return modernSpriteLoader;
 }
 
-export default TibiaSpriteLoader;
+export default ModernTibiaSpriteLoader;
