@@ -1,0 +1,95 @@
+{
+  "version": "15.25",
+  "engine": "Canary (OpenTibiaBR)",
+  "sprites": {
+    "tiles": {
+      "grass": 4526,
+      "dirt": 4528,
+      "sand": 4529,
+      "ice": 4530,
+      "swamp": 4532,
+      "lava": 4531,
+      "stone": 4527,
+      "tree": 860,
+      "dead_tree": 861,
+      "cactus": 862,
+      "ice_rock": 863,
+      "bone": 864,
+      "flower": 4527,
+      "mushroom": 864,
+      "rock": 4530,
+      "bush": 4528,
+      "log": 860
+    },
+    "decorations": {
+      "flower": 4527,
+      "mushroom": 864,
+      "rock": 4530,
+      "tree": 860,
+      "bush": 4528,
+      "log": 860,
+      "dead_tree": 861,
+      "cactus": 862,
+      "ice_rock": 863,
+      "snow_pile": 864,
+      "frozen_tree": 861,
+      "bone": 864,
+      "skull": 865,
+      "bog": 4532,
+      "lava_pool": 4533
+    },
+    "monsters": {
+      "Rat": 282,
+      "Cave Rat": 282,
+      "Spider": 218,
+      "Poison Spider": 218,
+      "Wild Warrior": 131,
+      "Hunter": 131,
+      "Deer": 221,
+      "Bear": 219,
+      "Ghoul": 320,
+      "Necromancer": 220,
+      "Demon Skeleton": 320,
+      "Undead Dragon": 34,
+      "Scorpion": 324,
+      "Ankrahmun Pharaoh": 325,
+      "Sandstone Scorpion": 324,
+      "Rahemos": 325,
+      "Frost Dragon": 34,
+      "Ice Golem": 326,
+      "Crystal Spider": 218,
+      "Frost Giant": 327,
+      "Demon": 35,
+      "Hellfire Destroyer": 35,
+      "Juggernaut": 35,
+      "Gaz'Haragoth": 35
+    },
+    "vocations": {
+      "KNIGHT": { "male": 131, "female": 254 },
+      "PALADIN": { "male": 129, "female": 252 },
+      "SORCERER": { "male": 130, "female": 253 },
+      "DRUID": { "male": 136, "female": 256 },
+      "MONK": { "male": 152, "female": 152 },
+      "NONE": { "male": 128, "female": 251 }
+    },
+    "map": {
+      "width": 15,
+      "height": 10,
+      "tileSize": 32,
+      "isometric": true,
+      "angle": 45
+    }
+  },
+  "client": {
+    "name": "Tibia Client 15.25",
+    "source": "dudantas/tibia-client",
+    "files": [
+      "catalog-content.json",
+      "sprites-0.bmp.lzma",
+      "sprites-1.bmp.lzma",
+      "sprites-2.bmp.lzma",
+      "sprites-3.bmp.lzma",
+      "appearances.dat"
+    ]
+  }
+}
