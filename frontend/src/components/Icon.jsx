@@ -291,17 +291,4 @@ export function LeagueIcon({ league, size = 40 }) {
     );
 }
 
-// Exportar todos os componentes (named exports)
-export {
-    MaskIcon,
-    TabIcon,
-    ActionIcon,
-    MemberIcon,
-    LootIcon,
-    SpellIcon,
-    BossIcon,
-    CoinIcon,
-    StatusIcon,
-    LeanIcon,
-    LeagueIcon,
-};
+// Todos os componentes já foram exportados individualmente acima com 'export function'
