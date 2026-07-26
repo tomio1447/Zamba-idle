@@ -179,13 +179,13 @@ export const SPELLS = {
     },
     {
       id: 'exori_amp_kor',
-      name: 'Executioner's Throw',
+      name: 'Executioner\'s Throw',
       words: 'exori amp kor',
       mana: 225,
       level: 300,
       type: 'attack',
       icon: '⚔️',
-      description: 'Executioner's Throw (exori amp kor) - 225 MP, Lv. 300',
+      description: 'Executioner\'s Throw (exori amp kor) - 225 MP, Lv. 300',
       damage: 1050
     },
     {
@@ -414,13 +414,13 @@ export const SPELLS = {
     },
     {
       id: 'exori_min_flam',
-      name: 'Apprentice's Strike',
+      name: 'Apprentice\'s Strike',
       words: 'exori min flam',
       mana: 6,
       level: 8,
       type: 'attack',
       icon: '🔥',
-      description: 'Apprentice's Strike (exori min flam) - 6 MP, Lv. 8',
+      description: 'Apprentice\'s Strike (exori min flam) - 6 MP, Lv. 8',
       damage: 28
     },
     {
@@ -623,13 +623,13 @@ export const SPELLS = {
     },
     {
       id: 'exevo_gran_mas_flam',
-      name: 'Hell's Core',
+      name: 'Hell\'s Core',
       words: 'exevo gran mas flam',
       mana: 1100,
       level: 60,
       type: 'aoe',
       icon: '🔥',
-      description: 'Hell's Core (exevo gran mas flam) - 1100 MP, Lv. 60',
+      description: 'Hell\'s Core (exevo gran mas flam) - 1100 MP, Lv. 60',
       damage: 2320
     },
     {
@@ -746,13 +746,13 @@ export const SPELLS = {
     },
     {
       id: 'exori_min_flam',
-      name: 'Apprentice's Strike',
+      name: 'Apprentice\'s Strike',
       words: 'exori min flam',
       mana: 6,
       level: 8,
       type: 'attack',
       icon: '🔥',
-      description: 'Apprentice's Strike (exori min flam) - 6 MP, Lv. 8',
+      description: 'Apprentice\'s Strike (exori min flam) - 6 MP, Lv. 8',
       damage: 28
     },
     {
@@ -1032,13 +1032,13 @@ export const SPELLS = {
     },
     {
       id: 'exura_gran_sio',
-      name: 'Nature's Embrace',
+      name: 'Nature\'s Embrace',
       words: 'exura gran sio',
       mana: 400,
       level: 300,
       type: 'heal',
       icon: '💚',
-      description: 'Nature's Embrace (exura gran sio) - 400 MP, Lv. 300',
+      description: 'Nature\'s Embrace (exura gran sio) - 400 MP, Lv. 300',
       heal: 1100
     },
     {
