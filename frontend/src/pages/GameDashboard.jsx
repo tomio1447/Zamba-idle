@@ -106,6 +106,57 @@ export default function GameDashboard({ character, onUpdate }) {
     return () => clearInterval(interval);
   }, [char.isHunting]);
 
+  // Sistema de Auto-Attack e Auto-Monster-Attack (Canary/BaiakIdle)
+  useEffect(() => {
+    if (!char.isHunting || !helperSystem) return;
+
+    // Auto-Attack do jogador
+    if (helperSystem.enabled.autoAttack) {
+      const attackInterval = setInterval(async () => {
+        if (helperSystem && helperSystem.enabled.autoAttack && char.isHunting) {
+          try {
+            const result = await api.autoAttack(char.id);
+            if (result) {
+              setChar(result.character || char);
+              if (result.character?.currentInstance) {
+                setInstance(result.character.currentInstance);
+              }
+              if (onUpdate && result.character) onUpdate(result.character);
+            }
+          } catch (e) {
+            console.error('Auto-attack error:', e.message);
+          }
+        }
+      }, 1000);
+      return () => clearInterval(attackInterval);
+    }
+  }, [char.isHunting, helperSystem?.enabled?.autoAttack, char.id]);
+
+  // Auto-Monster-Attack (monstros atacam jogador automaticamente)
+  useEffect(() => {
+    if (!char.isHunting || !helperSystem) return;
+
+    // Nota: auto-monster-attack é ativado quando o jogador está caçando
+    // e os monstros vivos atacam automaticamente a cada intervalo
+    const monsterInterval = setInterval(async () => {
+      if (char.isHunting && instance && instance.monsters && instance.monsters.some(m => m.hp > 0)) {
+        try {
+          const result = await api.autoMonsterAttack(char.id);
+          if (result) {
+            setChar(result.character || char);
+            if (result.character?.currentInstance) {
+              setInstance(result.character.currentInstance);
+            }
+            if (onUpdate && result.character) onUpdate(result.character);
+          }
+        } catch (e) {
+          console.error('Auto-monster-attack error:', e.message);
+        }
+      }
+    }, 2000);
+    return () => clearInterval(monsterInterval);
+  }, [char.isHunting, instance, char.id]);
+
   // Atualizar status da instância
   useEffect(() => {
     if (!char.isHunting || !char.currentInstance) {

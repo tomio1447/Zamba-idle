@@ -428,6 +428,54 @@ export class Character {
     };
   }
 
+  // ============ SISTEMA DE ATAQUE AUTOMÁTICO ============
+
+  // Auto-Attack: Jogador ataca automaticamente (como no Canary/BaiakIdle)
+  autoAttack() {
+    if (!this.currentInstance || this.currentInstance.isCompleted) {
+      throw new Error('Nenhuma instância ativa');
+    }
+
+    const instance = this.currentInstance;
+    const aliveMonsters = instance.monsters.filter(m => m.currentHp > 0);
+    if (aliveMonsters.length === 0) {
+      // Se todos mortos, tentar completar a wave automaticamente
+      if (!instance.isCompleted) {
+        this.completeWave(instance);
+      }
+      return { success: true, message: 'Wave completa automaticamente', waveComplete: true };
+    }
+
+    // Priorizar boss se existir
+    const boss = aliveMonsters.find(m => m.isBoss);
+    if (boss && instance.isBossWave) {
+      return this.attackBoss();
+    }
+
+    // Encontrar o monstro com menor HP (como no HelperSystem)
+    const target = aliveMonsters.sort((a, b) => a.currentHp - b.currentHp)[0];
+    const targetIndex = instance.monsters.indexOf(target);
+
+    return this.attackMonster(targetIndex);
+  }
+
+  // Auto-Monster-Attack: Monstros atacam o jogador automaticamente
+  // (simula o dano contínuo dos monstros sem que o jogador ataque)
+  autoMonsterAttack() {
+    if (!this.currentInstance || this.currentInstance.isCompleted) {
+      return { damageTaken: 0, dead: false, message: 'Nenhuma instância ativa' };
+    }
+
+    const instance = this.currentInstance;
+    const result = this.takeDamageFromMonsters(instance);
+
+    return {
+      ...result,
+      message: 'Monstros atacaram automaticamente',
+      instance: this.getInstanceData(instance),
+    };
+  }
+
   // ============ SISTEMA DE BOSS ============
 
   // Atacar o boss

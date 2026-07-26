@@ -53,6 +53,14 @@ export const api = {
     method: 'POST',
   }),
 
+  autoAttack: (characterId) => request(`/characters/${characterId}/instance/auto-attack`, {
+    method: 'POST',
+  }),
+
+  autoMonsterAttack: (characterId) => request(`/characters/${characterId}/instance/auto-monster-attack`, {
+    method: 'POST',
+  }),
+
   fleeInstance: (characterId) => request(`/characters/${characterId}/instance/flee`, {
     method: 'POST',
   }),

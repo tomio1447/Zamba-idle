@@ -191,6 +191,36 @@ router.get('/characters/:id/instance', (req, res) => {
   }
 });
 
+// Auto-Attack do jogador (baseado no Canary/BaiakIdle Helper)
+router.post('/characters/:id/instance/auto-attack', (req, res) => {
+  try {
+    const character = getCharacter(req.params.id);
+    if (!character) {
+      return res.status(404).json({ error: 'Personagem não encontrado' });
+    }
+
+    const result = character.autoAttack();
+    res.json({ ...result, character: character.toJSON() });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Auto-Monster-Attack (monstros atacam o jogador automaticamente)
+router.post('/characters/:id/instance/auto-monster-attack', (req, res) => {
+  try {
+    const character = getCharacter(req.params.id);
+    if (!character) {
+      return res.status(404).json({ error: 'Personagem não encontrado' });
+    }
+
+    const result = character.autoMonsterAttack();
+    res.json({ ...result, character: character.toJSON() });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // ============ LOOT ============
 
 router.post('/characters/:id/loot/sell', (req, res) => {
