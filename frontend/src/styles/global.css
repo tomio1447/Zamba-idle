@@ -130,6 +130,100 @@ body {
   padding: 12px 14px;
 }
 
+/* HUD BaiakIdle */
+.baiakidle-hud {
+  background: linear-gradient(180deg, #1c1c1a 0%, #232321 100%);
+  border: 1px solid var(--edge);
+  border-radius: 5px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.hud-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hud-top {
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--edge);
+  margin-bottom: 6px;
+}
+
+.hud-middle {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 8px;
+  min-width: 90px;
+  background: var(--sunken);
+  border-radius: 4px;
+  border: 1px solid var(--edge);
+}
+
+.hud-label {
+  font-size: 9px;
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.hud-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-stamina .hud-label { color: var(--mana); }
+.hud-boosts .hud-label { color: var(--hp); }
+.hud-skills .hud-label { color: var(--ms); }
+.hud-damage .hud-label { color: var(--red); }
+.hud-loot .hud-label { color: var(--gold); }
+
+.hud-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--dim);
+}
+
+.hud-info strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.hud-timer {
+  font-family: ui-monospace, SF Mono, Menlo, monospace;
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 700;
+  text-align: center;
+  min-width: 140px;
+}
+
+.hud-rates {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.rate-green { color: var(--hp); font-weight: 700; }
+.rate-gold { color: var(--gold); font-weight: 700; }
+
 /* Footer */
 .footer {
   background: var(--panel);

@@ -177,6 +177,16 @@ export default function GameDashboard({ character, onUpdate }) {
   const xpPercentage = (char.experience / char.xpToNextLevel) * 100;
   const currentZone = zones.find(z => z.id === char.currentHunt);
 
+  // Stats adicionais para HUD igual ao BaiakIdle
+  const hudStats = {
+    stamina: `${char.stamina}/${char.staminaMax}`,
+    xpRate: char.isHunting ? Math.round(char.experience / Math.max(elapsedTime, 1)) : 0,
+    goldRate: char.isHunting ? Math.round(char.gold / Math.max(elapsedTime, 1)) : 0,
+    killRate: char.isHunting ? Math.round(char.totalMonstersKilled / Math.max(elapsedTime, 1)) : 0,
+    damageTaken: char.stats.hp < 150 ? 150 - char.stats.hp : 0,
+    lootRate: char.lootPouch.length,
+  };
+
   return (
     <div className="game-dashboard">
       {/* Modal da Boss Shop */}
@@ -200,6 +210,45 @@ export default function GameDashboard({ character, onUpdate }) {
           </div>
         </div>
       )}
+
+      {/* HUD no topo igual ao BaiakIdle */}
+      <div className="baiakidle-hud">
+        <div className="hud-row hud-top">
+          <div className="hud-item hud-stamina">
+            <span className="hud-label">STAMINA</span>
+            <span className="hud-value">{hudStats.stamina}</span>
+          </div>
+          <div className="hud-item hud-boosts">
+            <span className="hud-label">BOOSTS</span>
+            <span className="hud-value">{char.activeBoosts?.xpBoost ? '2x XP' : 'Nenhum'}</span>
+          </div>
+          <div className="hud-item hud-skills">
+            <span className="hud-label">SKILLS</span>
+            <span className="hud-value">Melee: {char.skills?.melee || 10}</span>
+          </div>
+          <div className="hud-item hud-damage">
+            <span className="hud-label">DAMAGE</span>
+            <span className="hud-value">Session: {hudStats.damageTaken}</span>
+          </div>
+          <div className="hud-item hud-loot">
+            <span className="hud-label">LOOT ANALYZER</span>
+            <span className="hud-value">{hudStats.lootRate} itens</span>
+          </div>
+        </div>
+        <div className="hud-row hud-middle">
+          <div className="hud-info hud-zone">
+            <span>Zone: <strong>{currentZone?.name || 'Cidade'}</strong></span>
+            <span>Level: <strong>{char.level}</strong></span>
+          </div>
+          <div className="hud-timer hud-center">
+            <span>Tempo: <strong>{formatTime(elapsedTime)}</strong></span>
+          </div>
+          <div className="hud-rates hud-right">
+            <span>XP/s: <strong className="rate-green">{hudStats.xpRate}</strong></span>
+            <span>Gold/s: <strong className="rate-gold">{hudStats.goldRate}</strong></span>
+          </div>
+        </div>
+      </div>
 
       <div className="dashboard-grid">
         {/* Painel do Personagem */}
