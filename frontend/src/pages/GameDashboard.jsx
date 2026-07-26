@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import TibiaGameCanvas from '../components/TibiaGameCanvas';
 import BossShop from '../components/BossShop';
 import SpriteUploader from '../components/SpriteUploader';
+import Analyzers from '../components/Analyzers';
 
 const VOCATION_ICONS = {
   KNIGHT: '⚔️',
@@ -21,6 +22,7 @@ export default function GameDashboard({ character, onUpdate }) {
   const [showSpriteUploader, setShowSpriteUploader] = useState(false);
   const [spritesLoaded, setSpritesLoaded] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [showAnalyzers, setShowAnalyzers] = useState(true);
 
   // Carregar zonas de caçada
   useEffect(() => {
@@ -342,6 +344,12 @@ export default function GameDashboard({ character, onUpdate }) {
         <div className="panel stats-panel">
           <div className="panel-header">
             <h3>📊 Estatísticas</h3>
+            <button 
+              className="btn-toggle-analyzers"
+              onClick={() => setShowAnalyzers(!showAnalyzers)}
+            >
+              {showAnalyzers ? '🔽 Analyzers' : '🔼 Analyzers'}
+            </button>
           </div>
           <div className="stats-list">
             <div className="stats-row">
@@ -370,6 +378,17 @@ export default function GameDashboard({ character, onUpdate }) {
             </div>
           </div>
         </div>
+
+        {/* Painel de Analyzers */}
+        {showAnalyzers && (
+          <div className="panel analyzers-panel-container">
+            <Analyzers 
+              character={char}
+              instance={instance}
+              isActive={char.isHunting}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

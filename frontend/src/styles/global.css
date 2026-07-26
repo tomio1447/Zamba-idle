@@ -1540,3 +1540,450 @@ body {
   color: var(--accent-blue);
   font-weight: bold;
 }
+
+/* Toggle Analyzers Button */
+.btn-toggle-analyzers {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--accent-blue);
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.btn-toggle-analyzers:hover {
+  border-color: var(--accent-blue);
+  background: rgba(74, 158, 255, 0.1);
+}
+
+/* Analyzers Panel Container */
+.analyzers-panel-container {
+  grid-column: span 2;
+}
+
+@media (max-width: 768px) {
+  .analyzers-panel-container {
+    grid-column: span 1;
+  }
+}
+
+/* Analyzers Panel */
+.analyzers-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.analyzer-tabs {
+  display: flex;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.analyzer-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.analyzer-tab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.analyzer-tab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.tab-icon {
+  font-size: 1rem;
+}
+
+.analyzer-content {
+  padding: 1rem;
+  min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Overview Tab */
+.analyzer-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.8rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+}
+
+.stat-card.xp { border-left: 3px solid var(--accent-blue); }
+.stat-card.gold { border-left: 3px solid var(--accent-gold); }
+.stat-card.monsters { border-left: 3px solid var(--accent-green); }
+.stat-card.time { border-left: 3px solid var(--accent-purple); }
+
+.stat-card .stat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-card .stat-info {
+  flex: 1;
+}
+
+.stat-card .stat-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.stat-card .stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.stat-card .stat-rate {
+  font-size: 0.85rem;
+  color: var(--accent-blue);
+  font-weight: bold;
+}
+
+.analyzer-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0.8rem;
+  background: var(--bg-card);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.detail-row span:first-child {
+  color: var(--text-secondary);
+}
+
+.detail-value {
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.detail-value.gold { color: var(--accent-gold); }
+.detail-value.boss { color: var(--accent-red); }
+.detail-value.deaths { color: #ef4444; }
+
+/* Skills Tab */
+.analyzer-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.analyzer-skills h4 {
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem;
+}
+
+.skill-card {
+  padding: 0.8rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+}
+
+.skill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.skill-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.skill-level {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--accent-blue);
+}
+
+.skill-bar-container {
+  height: 6px;
+  background: var(--bg-primary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.skill-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+  transition: width 0.3s ease;
+}
+
+.skill-gain {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.gain-positive {
+  color: var(--accent-green);
+}
+
+.gain-percent {
+  color: var(--accent-gold);
+}
+
+.skills-summary {
+  padding: 0.8rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+}
+
+.skills-summary h5 {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  font-size: 0.85rem;
+}
+
+.summary-row span:first-child {
+  color: var(--text-secondary);
+}
+
+/* Loot Tab */
+.analyzer-loot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.analyzer-loot h4 {
+  color: var(--text-primary);
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem;
+}
+
+.loot-table, .monster-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.loot-header, .monster-header {
+  display: grid;
+  padding: 0.5rem 0.8rem;
+  background: var(--bg-card);
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.loot-header {
+  grid-template-columns: 1fr 60px 80px;
+}
+
+.monster-header {
+  grid-template-columns: 1fr 60px 60px;
+}
+
+.loot-row, .monster-row {
+  display: grid;
+  padding: 0.4rem 0.8rem;
+  background: var(--bg-card);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.loot-row {
+  grid-template-columns: 1fr 60px 80px;
+}
+
+.monster-row {
+  grid-template-columns: 1fr 60px 60px;
+}
+
+.loot-row:hover, .monster-row:hover {
+  border-color: var(--border-color);
+}
+
+.loot-row.rare {
+  background: rgba(245, 166, 35, 0.1);
+  border-color: var(--accent-gold);
+}
+
+.loot-name, .monster-name {
+  color: var(--text-primary);
+}
+
+.loot-qty, .monster-count {
+  text-align: center;
+  color: var(--accent-blue);
+}
+
+.loot-value {
+  text-align: right;
+  color: var(--accent-gold);
+  font-weight: bold;
+}
+
+.monster-percent {
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+/* Damage Tab */
+.analyzer-damage {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.analyzer-damage h4 {
+  color: var(--text-primary);
+}
+
+.damage-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.damage-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+}
+
+.damage-card.dealt {
+  border-color: var(--accent-green);
+}
+
+.damage-card.taken {
+  border-color: var(--accent-red);
+}
+
+.damage-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.damage-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.damage-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.damage-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+}
+
+/* Log Tab */
+.analyzer-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.analyzer-log h4 {
+  color: var(--text-primary);
+}
+
+.log-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  display: flex;
+  gap: 0.8rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.log-entry:nth-child(odd) {
+  background: var(--bg-card);
+}
+
+.log-time {
+  color: var(--text-secondary);
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+.log-message {
+  color: var(--text-primary);
+}
+
+.log-entry.kill .log-message { color: var(--accent-green); }
+.log-entry.boss_kill .log-message { color: var(--accent-gold); font-weight: bold; }
+.log-entry.death .log-message { color: var(--accent-red); }
+.log-entry.loot .log-message { color: var(--accent-blue); }
+.log-entry.skill .log-message { color: var(--accent-purple); }
