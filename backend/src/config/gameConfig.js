@@ -39,6 +39,7 @@ export const VOCATIONS = {
   PALADIN: { id: 2, name: 'Paladin', baseHp: 155, baseMp: 90, baseCap: 470, distanceBonus: 1.3 },
   SORCERER: { id: 3, name: 'Sorcerer', baseHp: 120, baseMp: 145, baseCap: 360, magicBonus: 1.5 },
   DRUID: { id: 4, name: 'Druid', baseHp: 120, baseMp: 145, baseCap: 360, magicBonus: 1.3 },
+  MONK: { id: 5, name: 'Monk', baseHp: 165, baseMp: 80, baseCap: 430, meleeBonus: 1.2, magicBonus: 0.8 },
 };
 
 // Zonas de caçada disponíveis

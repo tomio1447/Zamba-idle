@@ -6,6 +6,7 @@ const VOCATIONS = [
   { id: 'PALADIN', name: 'Paladin', icon: '🏹', desc: 'Atirador divino. Equilibra combate à distância e magia.' },
   { id: 'SORCERER', name: 'Sorcerer', icon: '🔥', desc: 'Mestre das chamas. Alto poder mágico e dano de fogo.' },
   { id: 'DRUID', name: 'Druid', icon: '❄️', desc: 'Mestre do gelo. Suporte e magias de cura e gelo.' },
+  { id: 'MONK', name: 'Monk', icon: '🧘', desc: 'Mestre do chi. Combate corpo a corpo com magias de cura.' },
 ];
 
 export default function CreateCharacter({ onSubmit, onCancel }) {

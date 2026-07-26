@@ -4,12 +4,15 @@ import TibiaGameCanvas from '../components/TibiaGameCanvas';
 import BossShop from '../components/BossShop';
 import SpriteUploader from '../components/SpriteUploader';
 import Analyzers from '../components/Analyzers';
+import Helper from '../components/Helper';
+import Spells from '../components/Spells';
 
 const VOCATION_ICONS = {
   KNIGHT: '⚔️',
   PALADIN: '🏹',
   SORCERER: '🔥',
   DRUID: '❄️',
+  MONK: '🧘',
   NONE: '👤',
 };
 
@@ -389,6 +392,22 @@ export default function GameDashboard({ character, onUpdate }) {
             />
           </div>
         )}
+
+        {/* Painel de Helper e Spells */}
+        <div className="panel helper-spells-panel">
+          <div className="helper-spells-grid">
+            <Helper 
+              character={char}
+              onToggle={(feature, enabled) => console.log(`Helper ${feature}: ${enabled}`)}
+              isActive={true}
+            />
+            <Spells 
+              character={char}
+              onCastSpell={(spell) => console.log('Cast spell:', spell)}
+              isActive={true}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
