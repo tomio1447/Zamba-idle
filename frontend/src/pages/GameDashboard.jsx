@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
+import { getHelperSystem } from '../utils/helper.js';
 import TibiaGameCanvas from '../components/TibiaGameCanvas';
 import BossShop from '../components/BossShop';
 import SpriteUploader from '../components/SpriteUploader';
@@ -67,6 +68,30 @@ export default function GameDashboard({ character, onUpdate }) {
   useEffect(() => {
     api.getZones().then(setZones).catch(console.error);
   }, []);
+
+  const [helperSystem, setHelperSystem] = useState(null);
+
+  // Inicializar sistema de Helper
+  useEffect(() => {
+    if (!char || !char.id) return;
+    
+    const callbacks = {
+      onAttack: (monsterIndex) => handleAttack(monsterIndex || 0),
+      onAttackBoss: () => handleAttackBoss(),
+      onFlee: () => handleFlee(),
+      onSellLoot: () => handleSellLoot(),
+      onCastSpell: (spell) => console.log('Auto-cast spell:', spell),
+      onCollectLoot: () => console.log('Auto-collect loot'),
+      onEatFood: () => console.log('Auto-eat food'),
+    };
+    
+    const helper = getHelperSystem({ ...char, currentInstance: instance }, callbacks);
+    setHelperSystem(helper);
+    
+    return () => {
+      if (helper) helper.stopAll();
+    };
+  }, [char.id]);
 
   // Timer
   useEffect(() => {
@@ -493,7 +518,14 @@ export default function GameDashboard({ character, onUpdate }) {
           <div className="helper-spells-grid">
             <Helper 
               character={char}
-              onToggle={(feature, enabled) => console.log(`Helper ${feature}: ${enabled}`)}
+              onToggle={(feature, enabled) => {
+                if (helperSystem) {
+                  helperSystem.toggle(feature);
+                  console.log(`Helper ${feature}: ${helperSystem.enabled[feature] ? 'ON' : 'OFF'}`);
+                } else {
+                  console.log(`Helper ${feature}: ${enabled ? 'ON' : 'OFF'} (sistema não inicializado)`);
+                }
+              }}
               isActive={true}
             />
             <Spells 
