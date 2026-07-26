@@ -4,9 +4,19 @@ import CharacterSelect from './pages/CharacterSelect';
 import GameDashboard from './pages/GameDashboard';
 import CreateCharacter from './pages/CreateCharacter';
 import Leaderboard from './pages/Leaderboard';
+import Icon from './components/Icon';
 
 // ID da conta (em produção viria de autenticação)
 const ACCOUNT_ID = 'account-001';
+
+// Ícones BaiakIdle
+const ICONS = {
+  logo: '/icons/logo.svg',
+  characters: '/icons/itens.svg',
+  ranking: '/icons/rank.svg',
+  logout: '/icons/sair.svg',
+  settings: '/icons/settings.svg',
+};
 
 export default function App() {
   const [view, setView] = useState('select'); // select, create, game, leaderboard
@@ -73,23 +83,29 @@ export default function App() {
       <header className="header">
         <div className="header-content">
           <h1 className="logo" onClick={() => setView('select')}>
-            ⚔️ Zamba Idle
+            <Icon src={ICONS.logo} size={30} />
+            Zamba Idle
           </h1>
           <nav className="nav">
             <button 
               className={`nav-btn ${view === 'select' ? 'active' : ''}`}
               onClick={() => setView('select')}
+              style={{ '--icon': `url(${ICONS.characters})` }}
             >
+              <Icon src={ICONS.characters} size={18} />
               Personagens
             </button>
             <button 
               className={`nav-btn ${view === 'leaderboard' ? 'active' : ''}`}
               onClick={() => setView('leaderboard')}
+              style={{ '--icon': `url(${ICONS.ranking})` }}
             >
+              <Icon src={ICONS.ranking} size={18} />
               Ranking
             </button>
             {selectedCharacter && (
               <button className="nav-btn logout" onClick={handleLogout}>
+                <Icon src={ICONS.logout} size={18} />
                 Sair
               </button>
             )}

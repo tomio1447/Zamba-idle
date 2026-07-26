@@ -8,14 +8,47 @@ import Helper from '../components/Helper';
 import Spells from '../components/Spells';
 import HuntsGrid from '../components/HuntsGrid';
 import BossBar from '../components/BossBar';
+import Icon, { MaskIcon } from '../components/Icon';
+
+// Ícones SVG do BaiakIdle
+const ICONS = {
+  helper: '/icons/helper.svg',
+  settings: '/icons/settings.svg',
+  skills: '/icons/skills.svg',
+  itens: '/icons/itens.svg',
+  aparencia: '/icons/aparencia.svg',
+  leave: '/icons/leave.svg',
+  kick: '/icons/kick.svg',
+  skull: '/icons/skull.svg',
+  vipCrown: '/icons/vip-crown.svg',
+  goldcoin: '/icons/icon-goldcoin.png',
+  coin: '/icons/coin.gif',
+  discord: '/icons/discord.svg',
+  logout: '/icons/sair.svg',
+  cyclopedia: '/icons/cyclopedia.svg',
+  prey: '/icons/prey.svg',
+  build: '/icons/build.svg',
+  exercise: '/icons/exercise.svg',
+  forge: '/icons/forja.svg',
+  imbue: '/icons/imbue.svg',
+  merchant: '/icons/mercador.svg',
+  arena: '/icons/arena.svg',
+  shop: '/icons/loja.svg',
+  chest: '/icons/armazem.svg',
+  market: '/icons/market.svg',
+  guild: '/icons/guild.svg',
+  vip: '/icons/vip.svg',
+  highscore: '/icons/rank.svg',
+  daily: '/icons/daily.svg',
+};
 
 const VOCATION_ICONS = {
-  KNIGHT: '⚔️',
-  PALADIN: '🏹',
-  SORCERER: '🔥',
-  DRUID: '❄️',
-  MONK: '🧘',
-  NONE: '👤',
+  KNIGHT: '/icons/vocations/knight.svg',
+  PALADIN: '/icons/vocations/paladin.svg',
+  SORCERER: '/icons/vocations/sorcerer.svg',
+  DRUID: '/icons/vocations/druid.svg',
+  MONK: '/icons/vocations/monk.svg',
+  NONE: '/icons/vocations/none.svg',
 };
 
 export default function GameDashboard({ character, onUpdate }) {
@@ -172,7 +205,10 @@ export default function GameDashboard({ character, onUpdate }) {
         {/* Painel do Personagem */}
         <div className="panel character-panel">
           <div className="panel-header">
-            <h3>{VOCATION_ICONS[char.vocation]} {char.name}</h3>
+            <h3>
+              <Icon src={VOCATION_ICONS[char.vocation]} size={20} />
+              {char.name}
+            </h3>
             <span className="vocation-badge">{char.vocation}</span>
           </div>
 
@@ -192,29 +228,29 @@ export default function GameDashboard({ character, onUpdate }) {
 
           <div className="stats-grid">
             <div className="stat-item">
-              <span className="stat-icon">❤️</span>
+              <Icon src="/icons/status/hp.png" size={16} />
               <span className="stat-val">{char.stats.hp}</span>
               <span className="stat-name">HP</span>
             </div>
             <div className="stat-item">
-              <span className="stat-icon">💙</span>
+              <Icon src="/icons/status/mana.png" size={16} />
               <span className="stat-val">{char.stats.mp}</span>
               <span className="stat-name">MP</span>
             </div>
             <div className="stat-item">
-              <span className="stat-icon">⚡</span>
+              <Icon src="/icons/status/stamina.png" size={16} />
               <span className="stat-val">{char.stamina}/{char.staminaMax}</span>
               <span className="stat-name">Stamina</span>
             </div>
             <div className="stat-item">
-              <span className="stat-icon">💰</span>
+              <Icon src={ICONS.goldcoin} size={16} />
               <span className="stat-val gold">{char.gold.toLocaleString()}</span>
               <span className="stat-name">Gold</span>
             </div>
           </div>
 
           <div className="boss-coins-display">
-            <span className="boss-coin-icon">👑</span>
+            <Icon src={ICONS.vipCrown} size={20} />
             <span className="boss-coin-value">{char.bossCoins}</span>
             <button className="btn-boss-shop" onClick={() => setShowBossShop(true)}>
               Boss Shop
@@ -237,7 +273,7 @@ export default function GameDashboard({ character, onUpdate }) {
         {/* Área Principal do Jogo */}
         <div className="panel game-panel">
           <div className="panel-header">
-            <h3>⚔️ Campo de Batalha</h3>
+            <h3><MaskIcon icon={ICONS.arena} size={18} /> Campo de Batalha</h3>
             <div className="panel-actions">
               {char.isHunting && (
                 <span className="hunt-timer">{formatTime(elapsedTime)}</span>
@@ -322,7 +358,7 @@ export default function GameDashboard({ character, onUpdate }) {
         {/* Painel de Loot */}
         <div className="panel loot-panel">
           <div className="panel-header">
-            <h3>🎒 Loot Pouch</h3>
+            <h3><MaskIcon icon={ICONS.chest} size={18} /> Loot Pouch</h3>
             <span className="loot-count">{char.lootPouch.length}/{char.lootPouchSlots}</span>
           </div>
 
@@ -356,7 +392,7 @@ export default function GameDashboard({ character, onUpdate }) {
         {/* Painel de Estatísticas */}
         <div className="panel stats-panel">
           <div className="panel-header">
-            <h3>📊 Estatísticas</h3>
+            <h3><MaskIcon icon={ICONS.cyclopedia} size={18} /> Estatísticas</h3>
             <button 
               className="btn-toggle-analyzers"
               onClick={() => setShowAnalyzers(!showAnalyzers)}
