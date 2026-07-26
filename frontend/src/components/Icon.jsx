@@ -27,7 +27,10 @@ export default function Icon({
             onError={(e) => {
                 // Fallback se a imagem não carregar
                 e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'inline';
+                const sibling = e.target.nextSibling;
+                if (sibling && sibling.style) {
+                    sibling.style.display = 'inline';
+                }
             }}
         />
     );

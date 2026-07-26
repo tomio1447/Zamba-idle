@@ -58,14 +58,19 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
     }
 
     if (spritesLoaded) {
-      const image = loader.getSprite(spriteId);
-      if (image) {
-        spriteCache.set(spriteId, image);
-        const drawX = centered ? x - width / 2 : x;
-        const drawY = centered ? y - height / 2 : y;
-        ctx.drawImage(image, drawX, drawY, width, height);
-        return true;
+      // Tentar obter do cache interno do loader
+      if (loader.spriteCache && loader.spriteCache.has(spriteId)) {
+        const image = loader.spriteCache.get(spriteId);
+        if (image) {
+          spriteCache.set(spriteId, image);
+          const drawX = centered ? x - width / 2 : x;
+          const drawY = centered ? y - height / 2 : y;
+          ctx.drawImage(image, drawX, drawY, width, height);
+          return true;
+        }
       }
+      // Se não estiver no cache, retornar false (usa fallback visual)
+      return false;
     }
     
     return false;
