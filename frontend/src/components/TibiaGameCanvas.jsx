@@ -84,8 +84,13 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
     ctx.fillStyle = '#0a0a15';
     ctx.fillRect(0, 0, width, height);
 
-    // Desenhar chão estilo Tibia (tiles)
-    drawTibiaFloor(ctx, width, height);
+    // Desenhar mapa da instância (se disponível)
+    if (instance && instance.map) {
+      drawMap(ctx, instance.map, width, height);
+    } else {
+      // Fallback: desenhar chão estilo Tibia (tiles)
+      drawTibiaFloor(ctx, width, height);
+    }
 
     // Desenhar personagem
     if (character) {
@@ -114,7 +119,100 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
 
   }, [character, instance, spritesLoaded, drawSprite]);
 
-  // Desenhar chão estilo Tibia
+  // Desenhar mapa procedural
+  const drawMap = (ctx, map, canvasWidth, canvasHeight) => {
+    const tileSize = Math.min(canvasWidth / map.width, canvasHeight / map.height);
+    const offsetX = (canvasWidth - map.width * tileSize) / 2;
+    const offsetY = (canvasHeight - map.height * tileSize) / 2;
+
+    // Desenhar tiles
+    for (let y = 0; y < map.height; y++) {
+      for (let x = 0; x < map.width; x++) {
+        const tile = map.tiles[y][x];
+        const px = offsetX + x * tileSize;
+        const py = offsetY + y * tileSize;
+        
+        // Cor base do tile
+        ctx.fillStyle = getTileColor(tile.variant);
+        ctx.fillRect(px, py, tileSize - 1, tileSize - 1);
+        
+        // Borda sutil
+        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(px, py, tileSize - 1, tileSize - 1);
+      }
+    }
+
+    // Desenhar decorações
+    if (map.decorations) {
+      map.decorations.forEach(deco => {
+        const px = offsetX + deco.x * tileSize + tileSize / 2;
+        const py = offsetY + deco.y * tileSize + tileSize / 2;
+        drawDecoration(ctx, px, py, tileSize, deco.type);
+      });
+    }
+
+    // Desenhar pontos de spawn (debug - opcional)
+    /*
+    if (map.spawnPoints) {
+      map.spawnPoints.forEach(point => {
+        const px = offsetX + point.x * tileSize + tileSize / 2;
+        const py = offsetY + point.y * tileSize + tileSize / 2;
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.beginPath();
+        ctx.arc(px, py, tileSize / 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+    */
+  };
+
+  // Desenhar decoração
+  const drawDecoration = (ctx, x, y, size, type) => {
+    const colors = {
+      'flower': '#ff69b4',
+      'mushroom': '#8b4513',
+      'rock': '#808080',
+      'tree': '#1a3a1a',
+      'bush': '#2e8b57',
+      'log': '#8b4513',
+      'dead_tree': '#2d2d2d',
+      'cactus': '#228b22',
+      'ice_rock': '#87ceeb',
+      'snow_pile': '#fffafa',
+      'frozen_tree': '#e0ffff',
+      'bone': '#f5f5dc',
+      'skull': '#f5f5f5',
+      'bog': '#2f4f2f',
+      'lava_pool': '#ff4500',
+    };
+    
+    ctx.fillStyle = colors[type] || '#666666';
+    ctx.beginPath();
+    ctx.arc(x, y, size / 4, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  // Obter cor do tile
+  const getTileColor = (variant) => {
+    const colors = {
+      'grass': '#2d5a27',
+      'dirt': '#5c4033',
+      'sand': '#c2b280',
+      'ice': '#b0e0e6',
+      'swamp': '#3d4a3d',
+      'lava': '#8b0000',
+      'stone': '#696969',
+      'tree': '#1a3a1a',
+      'dead_tree': '#2d2d2d',
+      'cactus': '#228b22',
+      'ice_rock': '#87ceeb',
+      'bone': '#f5f5dc',
+    };
+    return colors[variant] || '#333333';
+  };
+
+  // Desenhar chão estilo Tibia (fallback)
   const drawTibiaFloor = (ctx, width, height) => {
     const tileSize = 32;
     

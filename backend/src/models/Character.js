@@ -18,6 +18,7 @@ import {
   getBossForZone, 
   calculateBossRewards 
 } from '../config/bossConfig.js';
+import { getMapGenerator } from '../utils/mapGenerator.js';
 
 // Armazenamento em memória
 const characters = new Map();
@@ -93,11 +94,16 @@ export class Character {
     const instanceId = uuidv4();
     const totalWaves = this.calculateTotalWaves(zone);
     
+    // Gerar mapa procedural para a zona
+    const mapGenerator = getMapGenerator();
+    const map = mapGenerator.generateMap(zoneId, zone);
+    
     const instance = {
       id: instanceId,
       zoneId,
       zoneName: zone.name,
       zone,
+      map,
       wave: 1,
       totalWaves,
       monstersKilledInWave: 0,
