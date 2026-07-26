@@ -6,6 +6,7 @@ import SpriteUploader from '../components/SpriteUploader';
 import Analyzers from '../components/Analyzers';
 import Helper from '../components/Helper';
 import Spells from '../components/Spells';
+import HuntsGrid from '../components/HuntsGrid';
 
 const VOCATION_ICONS = {
   KNIGHT: '⚔️',
@@ -276,35 +277,12 @@ export default function GameDashboard({ character, onUpdate }) {
             </div>
           ) : (
             <div className="zone-selector">
-              <p className="hunt-info">Escolha uma zona para iniciar uma instância de caçada:</p>
-              <div className="zones-list">
-                {zones.map(zone => {
-                  const isLocked = char.level < zone.minLevel;
-                  return (
-                    <div 
-                      key={zone.id} 
-                      className={`zone-card ${isLocked ? 'locked' : ''}`}
-                      onClick={() => !isLocked && handleCreateInstance(zone.id)}
-                    >
-                      <div className="zone-header">
-                        <span className="zone-name">{zone.name}</span>
-                        {isLocked && <span className="lock-icon">🔒</span>}
-                      </div>
-                      <div className="zone-info">
-                        <span>Nível {zone.minLevel}+</span>
-                        <span>XP: {zone.xpGain}/s</span>
-                      </div>
-                      <p className="zone-desc">{zone.description}</p>
-                      <div className="zone-monsters">
-                        👾 {zone.monsters.slice(0, 3).join(', ')}...
-                      </div>
-                      <div className="zone-boss">
-                        👑 Boss disponível a cada 10 waves
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <HuntsGrid 
+                zones={zones}
+                playerLevel={char.level}
+                onSelectHunt={handleCreateInstance}
+                currentHunt={char.currentHunt}
+              />
             </div>
           )}
         </div>
