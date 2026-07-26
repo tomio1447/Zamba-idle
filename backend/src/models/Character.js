@@ -20,6 +20,11 @@ import {
 } from '../config/bossConfig.js';
 import { getMapGenerator } from '../utils/mapGenerator.js';
 
+import canaryService, { initCanaryService } from '../services/canaryService.js';
+
+// Inicializar Canary ao carregar o módulo
+initCanaryService().catch(err => console.error('Erro ao inicializar Canary:', err));
+
 // Armazenamento em memória
 const characters = new Map();
 const instances = new Map();

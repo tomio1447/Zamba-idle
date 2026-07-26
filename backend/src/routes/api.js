@@ -1,6 +1,7 @@
 // Zamba Idle - Rotas da API
 // Sistema completo com Instâncias e Boss Fights
 import { Router } from 'express';
+import canaryService from '../services/canaryService.js';
 import { 
   createCharacter, 
   getCharacter, 
@@ -15,7 +16,7 @@ const router = Router();
 
 // ============ PERSONAGENS ============
 
-router.post('/characters', (req, res) => {
+router.post('/characters', async (req, res) => {
   try {
     const { name, vocation, accountId } = req.body;
 
@@ -31,32 +32,71 @@ router.post('/characters', (req, res) => {
       return res.status(400).json({ error: 'Vocação inválida' });
     }
 
-    const character = createCharacter({ name, vocation, accountId });
-    res.status(201).json(character.toJSON());
+    // Tentar criar no Canary (integração real)
+    let character;
+    try {
+      const result = await canaryService.createCanaryCharacter({ name, vocation, accountId });
+      character = result || createCharacter({ name, vocation, accountId });
+    } catch (e) {
+      console.log('Canary não disponível, usando memória:', e.message);
+      character = createCharacter({ name, vocation, accountId });
+    }
+
+    res.status(201).json(typeof character === 'object' && character.toJSON ? character.toJSON() : character);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.get('/characters', (req, res) => {
+router.get('/characters', async (req, res) => {
   const { accountId } = req.query;
   if (!accountId) {
     return res.status(400).json({ error: 'accountId é obrigatório' });
   }
   
-  const characters = getCharactersByAccount(accountId);
-  res.json(characters.map(c => c.toJSON()));
-});
-
-router.get('/characters/:id', (req, res) => {
-  const character = getCharacter(req.params.id);
-  if (!character) {
-    return res.status(404).json({ error: 'Personagem não encontrado' });
+  try {
+    // Tentar buscar no Canary
+    let characters = await canaryService.getCharacters(accountId);
+    // Se não tiver no Canary, usar memória
+    if (!characters || characters.length === 0) {
+      characters = getCharactersByAccount(accountId).map(c => c.toJSON());
+    }
+    res.json(characters);
+  } catch (error) {
+    console.error('Erro ao buscar no Canary:', error.message);
+    const characters = getCharactersByAccount(accountId);
+    res.json(characters.map(c => c.toJSON()));
   }
-  res.json(character.toJSON());
 });
 
-router.delete('/characters/:id', (req, res) => {
+router.get('/characters/:id', async (req, res) => {
+  try {
+    // Tentar buscar no Canary
+    let character = await canaryService.getCharacterById(req.params.id);
+    if (!character) {
+      character = getCharacter(req.params.id);
+      if (!character) {
+        return res.status(404).json({ error: 'Personagem não encontrado' });
+      }
+      character = character.toJSON();
+    }
+    res.json(character);
+  } catch (error) {
+    console.error('Erro ao buscar no Canary:', error.message);
+    const character = getCharacter(req.params.id);
+    if (!character) {
+      return res.status(404).json({ error: 'Personagem não encontrado' });
+    }
+    res.json(character.toJSON());
+  }
+});
+
+router.delete('/characters/:id', async (req, res) => {
+  try {
+    await canaryService.deleteCanaryCharacter(req.params.id);
+  } catch (e) {
+    console.log('Canary delete ignorado:', e.message);
+  }
   const deleted = deleteCharacter(req.params.id);
   if (!deleted) {
     return res.status(404).json({ error: 'Personagem não encontrado' });

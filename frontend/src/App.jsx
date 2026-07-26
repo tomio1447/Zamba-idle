@@ -144,7 +144,7 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        <p>Zamba Idle © 2026 - Jogo idle baseado em Tibia | Engine: Canary (OpenTibiaBR)</p>
+        <p>Zamba Idle © 2026 - Jogo idle baseado em Tibia | Engine: Canary (OpenTibiaBR) - DB Integrado</p>
       </footer>
     </div>
   );
