@@ -262,6 +262,9 @@ export class Character {
       throw new Error('Monstro já está morto ou não existe');
     }
 
+    // Os monstros atacam o jogador de volta
+    const monsterAttackResult = this.takeDamageFromMonsters(instance);
+
     // Calcular dano baseado na vocação e skills
     const damage = this.calculateDamage(monster);
     monster.currentHp -= damage;
@@ -280,9 +283,6 @@ export class Character {
       dead: monsterAttackResult ? monsterAttackResult.dead : false,
     };
 
-    // Os monstros atacam o jogador de volta
-    const monsterAttackResult = this.takeDamageFromMonsters(instance);
-    
     // Verificar se matou o monstro
     if (monster.currentHp <= 0) {
       result.killed = true;
