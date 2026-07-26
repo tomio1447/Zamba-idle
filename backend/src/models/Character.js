@@ -209,6 +209,46 @@ export class Character {
     }
   }
 
+  // Calcular dano recebido dos monstros (quando eles atacam o jogador)
+  takeDamageFromMonsters(instance) {
+    const aliveMonsters = instance.monsters.filter(m => m.currentHp > 0);
+    if (aliveMonsters.length === 0) return { damageTaken: 0, dead: false };
+
+    let totalDamage = 0;
+    
+    // Cada monstro vivo ataca o jogador
+    aliveMonsters.forEach(monster => {
+      // Dano base do monstro (baseado no nível do jogador e zona)
+      const monsterData = MONSTERS[monster.name] || { damage: 5 };
+      let baseDamage = (monsterData.damage || 5) + Math.floor(this.level * 0.5);
+      
+      // Boss causa mais dano
+      if (monster.isBoss) baseDamage *= 2.5;
+      
+      // Defesa do jogador (baseado na vocação e shielding)
+      const defense = this.skills.shielding * 0.1 + (this.stats.hp > 100 ? 5 : 0);
+      const damageAfterDefense = Math.max(1, Math.floor(baseDamage - defense));
+      
+      totalDamage += damageAfterDefense;
+    });
+
+    // Aplicar dano ao jogador
+    this.stats.hp = Math.max(0, this.stats.hp - totalDamage);
+    const result = {
+      damageTaken: totalDamage,
+      currentHp: this.stats.hp,
+      maxHp: this.stats.hp,
+      dead: this.stats.hp <= 0,
+    };
+
+    if (result.dead) {
+      this.deaths++;
+      this.stats.hp = this.stats.hp; // Manter para registro
+    }
+
+    return result;
+  }
+
   // Atacar monstro na instância
   attackMonster(monsterIndex = 0) {
     if (!this.currentInstance || this.currentInstance.isCompleted) {
@@ -235,8 +275,14 @@ export class Character {
       rewards: null,
       waveComplete: false,
       bossSpawned: false,
+      damageTaken: monsterAttackResult ? monsterAttackResult.damageTaken : 0,
+      currentHp: monsterAttackResult ? monsterAttackResult.currentHp : this.stats.hp,
+      dead: monsterAttackResult ? monsterAttackResult.dead : false,
     };
 
+    // Os monstros atacam o jogador de volta
+    const monsterAttackResult = this.takeDamageFromMonsters(instance);
+    
     // Verificar se matou o monstro
     if (monster.currentHp <= 0) {
       result.killed = true;
