@@ -12,6 +12,8 @@ import {
 import { VOCATIONS, HUNTING_ZONES, CONFIG } from '../config/gameConfig.js';
 import { BOSSES, BOSS_SHOP, BOSS_REWARDS } from '../config/bossConfig.js';
 
+import accountService from '../services/accountService.js';
+
 const router = Router();
 
 // ============ PERSONAGENS ============
@@ -248,6 +250,93 @@ router.get('/boss-shop', (req, res) => {
 
 router.get('/config', (req, res) => {
   res.json(CONFIG);
+});
+
+// ============ ACCOUNTS (BANCO PERSONALIZADO) ============
+
+// Registro de account com conta e senha
+router.post('/register', async (req, res) => {
+  try {
+    const { username, password, email } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username e senha são obrigatórios' });
+    }
+
+    if (username.length < 3 || username.length > 30) {
+      return res.status(400).json({ error: 'Username deve ter entre 3 e 30 caracteres' });
+    }
+
+    if (password.length < 4) {
+      return res.status(400).json({ error: 'Senha deve ter pelo menos 4 caracteres' });
+    }
+
+    const result = await accountService.createAccount(username, password, email);
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Login com conta e senha
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username e senha são obrigatórios' });
+    }
+
+    const result = await accountService.loginAccount(username, password);
+    
+    if (!result.success) {
+      return res.status(401).json({ error: result.message });
+    }
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Criar personagem vinculado a uma account existente (banco personalizado)
+router.post('/accounts/:accountId/characters', async (req, res) => {
+  try {
+    const { name, vocation } = req.body;
+    const accountId = parseInt(req.params.accountId);
+
+    if (!name || !vocation || isNaN(accountId)) {
+      return res.status(400).json({ error: 'Nome, vocação e accountId são obrigatórios' });
+    }
+
+    if (!VOCATIONS[vocation]) {
+      return res.status(400).json({ error: 'Vocação inválida' });
+    }
+
+    const result = await accountService.createCharacterForAccount(accountId, {
+      name,
+      vocation,
+    });
+
+    res.status(201).json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Listar personagens de uma account (banco personalizado)
+router.get('/accounts/:accountId/characters', async (req, res) => {
+  try {
+    const accountId = parseInt(req.params.accountId);
+    if (isNaN(accountId)) {
+      return res.status(400).json({ error: 'accountId inválido' });
+    }
+
+    const characters = await accountService.getCharactersByAccount(accountId);
+    res.json(characters);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ============ LEADERBOARD ============

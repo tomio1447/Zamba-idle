@@ -3,7 +3,7 @@
 import express from 'express';
 import cors from 'cors';
 import apiRoutes from './routes/api.js';
-import { initCanaryDB } from './services/canaryDB.js';
+import { initCanaryDB, initCustomDB } from './services/canaryDB.js';
 import canaryService from './services/canaryService.js';
 
 const app = express();
@@ -11,6 +11,9 @@ const PORT = process.env.PORT || 3001;
 
 // Inicializar Canary DB
 initCanaryDB().catch(err => console.error('Erro na inicialização do Canary DB:', err.message));
+
+// Inicializar banco personalizado
+initCustomDB().catch(err => console.error('Erro na inicialização do banco personalizado:', err.message));
 
 // Middleware
 app.use(cors());

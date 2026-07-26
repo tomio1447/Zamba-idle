@@ -3,6 +3,7 @@
 
 import mysql from 'mysql2/promise';
 import CANARY_CONFIG from '../config/canaryConfig.js';
+import CUSTOM_DB_CONFIG, { SCHEMA } from '../config/customDBConfig.js';
 
 let pool = null;
 let isConnected = false;
@@ -204,8 +205,51 @@ export async function createCanaryPlayer(accountData, playerData) {
   }
 }
 
+// Inicializar banco personalizado (zamba_idle) com tabelas customizadas
+export async function initCustomDB() {
+  try {
+    // Criar pool para o banco personalizado (pode ser o mesmo host ou separado)
+    const customPool = mysql.createPool({
+      host: CUSTOM_DB_CONFIG.database.host,
+      port: CUSTOM_DB_CONFIG.database.port,
+      user: CUSTOM_DB_CONFIG.database.user,
+      password: CUSTOM_DB_CONFIG.database.password,
+      database: CUSTOM_DB_CONFIG.database.database,
+      waitForConnections: true,
+      connectionLimit: 5,
+      queueLimit: 0,
+      connectTimeout: 5000,
+    });
+
+    const conn = await customPool.getConnection();
+
+    // Criar banco se não existir
+    if (CUSTOM_DB_CONFIG.createDBIfNotExists) {
+      await conn.query(`CREATE DATABASE IF NOT EXISTS \`${CUSTOM_DB_CONFIG.database.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+      await conn.query(`USE \`${CUSTOM_DB_CONFIG.database.database}\``);
+    }
+
+    // Criar tabelas se não existirem
+    if (CUSTOM_DB_CONFIG.createTablesIfNotExists) {
+      await conn.query(SCHEMA.accounts);
+      await conn.query(SCHEMA.characters);
+      await conn.query(SCHEMA.sessions);
+      console.log('✅ Tabelas do banco personalizado criadas/verificadas');
+    }
+
+    conn.release();
+    await customPool.end();
+    console.log('✅ Banco personalizado Zamba Idle configurado:', CUSTOM_DB_CONFIG.database.database);
+    return true;
+  } catch (error) {
+    console.warn('⚠️ Erro ao configurar banco personalizado:', error.message);
+    return false;
+  }
+}
+
 export default {
   initCanaryDB,
+  initCustomDB,
   getConnection,
   executeQuery,
   executeSingle,
