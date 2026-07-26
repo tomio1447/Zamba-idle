@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
-import GameCanvas from '../components/GameCanvas';
+import TibiaGameCanvas from '../components/TibiaGameCanvas';
 import BossShop from '../components/BossShop';
+import SpriteUploader from '../components/SpriteUploader';
 
 const VOCATION_ICONS = {
   KNIGHT: '⚔️',
@@ -17,6 +18,8 @@ export default function GameDashboard({ character, onUpdate }) {
   const [instance, setInstance] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showBossShop, setShowBossShop] = useState(false);
+  const [showSpriteUploader, setShowSpriteUploader] = useState(false);
+  const [spritesLoaded, setSpritesLoaded] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
 
   // Carregar zonas de caçada
@@ -98,6 +101,11 @@ export default function GameDashboard({ character, onUpdate }) {
     }
   };
 
+  const handleSpritesLoaded = (loaded) => {
+    setSpritesLoaded(loaded);
+    setShowSpriteUploader(false);
+  };
+
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -117,6 +125,19 @@ export default function GameDashboard({ character, onUpdate }) {
           onClose={() => setShowBossShop(false)}
           onUpdate={(updated) => { setChar(updated); onUpdate(updated); }}
         />
+      )}
+
+      {/* Modal do Sprite Uploader */}
+      {showSpriteUploader && (
+        <div className="modal-overlay" onClick={() => setShowSpriteUploader(false)}>
+          <div className="modal sprite-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>🎮 Carregar Sprites do Tibia</h2>
+              <button className="modal-close" onClick={() => setShowSpriteUploader(false)}>✕</button>
+            </div>
+            <SpriteUploader onSpritesLoaded={handleSpritesLoaded} />
+          </div>
+        </div>
       )}
 
       <div className="dashboard-grid">
@@ -189,9 +210,18 @@ export default function GameDashboard({ character, onUpdate }) {
         <div className="panel game-panel">
           <div className="panel-header">
             <h3>⚔️ Campo de Batalha</h3>
-            {char.isHunting && (
-              <span className="hunt-timer">{formatTime(elapsedTime)}</span>
-            )}
+            <div className="panel-actions">
+              {char.isHunting && (
+                <span className="hunt-timer">{formatTime(elapsedTime)}</span>
+              )}
+              <button 
+                className="btn-sprite-upload"
+                onClick={() => setShowSpriteUploader(true)}
+                title="Carregar sprites do Tibia"
+              >
+                {spritesLoaded ? '✅ Sprites' : '🎨 Sprites'}
+              </button>
+            </div>
           </div>
 
           {char.isHunting && instance ? (
@@ -207,8 +237,8 @@ export default function GameDashboard({ character, onUpdate }) {
                 </div>
               </div>
 
-              {/* Canvas do Jogo */}
-              <GameCanvas 
+              {/* Canvas do Jogo com Sprites do Tibia */}
+              <TibiaGameCanvas 
                 character={char}
                 instance={instance}
                 onAttack={handleAttack}
