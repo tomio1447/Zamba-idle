@@ -293,7 +293,6 @@ export function LeagueIcon({ league, size = 40 }) {
 
 // Exportar todos os componentes (named exports)
 export {
-    Icon as default,
     MaskIcon,
     TabIcon,
     ActionIcon,
