@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { getSpriteLoader, MONSTER_SPRITES, VOCATION_SPRITES } from '../utils/spriteLoader';
+import { getModernSpriteLoader, MONSTER_SPRITES_MODERN, VOCATION_SPRITES_MODERN } from '../utils/spriteLoader';
 
 // Cache de sprites carregados
 const spriteCache = new Map();
@@ -14,10 +14,10 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
 
   // Carregar sprites do client Tibia
   useEffect(() => {
-    const loader = getSpriteLoader();
+    const loader = getModernSpriteLoader();
     
     // Tentar carregar dos arquivos locais
-    loader.loadFromFiles('/sprites/Tibia.spr', '/sprites/Tibia.dat')
+    loader.loadFromDirectory('/sprites/')
       .then(success => {
         if (success) {
           setSpritesLoaded(true);
@@ -45,7 +45,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
 
   // Desenhar sprite no canvas
   const drawSprite = useCallback((ctx, spriteId, x, y, width = 32, height = 32, centered = true) => {
-    const loader = getSpriteLoader();
+    const loader = getModernSpriteLoader();
     
     if (spriteCache.has(spriteId)) {
       const cached = spriteCache.get(spriteId);
@@ -58,7 +58,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
     }
 
     if (spritesLoaded) {
-      const image = loader.getSpriteImage(spriteId);
+      const image = loader.getSprite(spriteId);
       if (image) {
         spriteCache.set(spriteId, image);
         const drawX = centered ? x - width / 2 : x;
@@ -233,7 +233,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
 
   // Desenhar personagem
   const drawCharacter = (ctx, x, y, character) => {
-    const vocSprite = VOCATION_SPRITES[character.vocation] || VOCATION_SPRITES.NONE;
+    const vocSprite = VOCATION_SPRITES_MODERN[character.vocation] || VOCATION_SPRITES_MODERN.NONE;
     const spriteId = vocSprite.male;
     
     // Tentar desenhar sprite real
@@ -287,7 +287,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
 
   // Desenhar monstro
   const drawMonster = (ctx, x, y, monster) => {
-    const spriteId = MONSTER_SPRITES[monster.name] || 282;
+    const spriteId = MONSTER_SPRITES_MODERN[monster.name] || 282;
     
     const drawn = drawSprite(ctx, spriteId, x, y, 40, 40);
     
@@ -328,7 +328,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
 
   // Desenhar Boss
   const drawBoss = (ctx, x, y, boss) => {
-    const spriteId = MONSTER_SPRITES[boss.name] || 35;
+    const spriteId = MONSTER_SPRITES_MODERN[boss.name] || 35;
     
     // Aura do boss
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, 80);

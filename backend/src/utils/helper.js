@@ -1,6 +1,8 @@
 // Zamba Idle - Sistema de Helper (Auto-funcionalidades)
 // Como no BaiakIdle: Auto-attack, Auto-loot, Auto-sell, Auto-heal
 
+import { SPELLS } from '../config/spellsConfig.js';
+
 export class HelperSystem {
   constructor(character, callbacks) {
     this.character = character;
@@ -178,87 +180,22 @@ export class HelperSystem {
 
   // Obter magia de cura baseada na vocação
   getHealSpell() {
-    const spells = {
-      KNIGHT: { name: 'Exura', mana: 20, heal: 50, level: 1 },
-      PALADIN: { name: 'Exura San', mana: 30, heal: 80, level: 20 },
-      SORCERER: { name: 'Exura Gran', mana: 40, heal: 120, level: 40 },
-      DRUID: { name: 'Exura Gran Mas Res', mana: 50, heal: 150, level: 50 },
-      MONK: { name: 'Healing Circle', mana: 35, heal: 100, level: 30 },
-    };
-    return spells[this.character.vocation] || spells.KNIGHT;
+    const vocationSpells = SPELLS[this.character.vocation] || SPELLS.KNIGHT;
+    const available = vocationSpells.filter(s => s.type === 'heal' && this.character.level >= s.level);
+    return available.pop() || { name: 'Exura', mana: 20, heal: 50, level: 1 };
   }
 
   // Obter magia de ataque baseada na vocação
   getAttackSpell() {
-    const spells = {
-      KNIGHT: [
-        { name: 'Exori', mana: 30, damage: 80, level: 1 },
-        { name: 'Exori Gran', mana: 60, damage: 150, level: 30 },
-        { name: 'Exori Mas', mana: 100, damage: 250, level: 50 },
-      ],
-      PALADIN: [
-        { name: 'Exori San', mana: 40, damage: 100, level: 1 },
-        { name: 'Exevo Mas San', mana: 80, damage: 200, level: 40 },
-      ],
-      SORCERER: [
-        { name: 'Exori Vis', mana: 40, damage: 120, level: 1 },
-        { name: 'Exevo Mas Vis', mana: 100, damage: 280, level: 45 },
-      ],
-      DRUID: [
-        { name: 'Exori Tera', mana: 40, damage: 110, level: 1 },
-        { name: 'Exevo Mas Tera', mana: 100, damage: 260, level: 45 },
-      ],
-      MONK: [
-        { name: 'Chi Strike', mana: 35, damage: 90, level: 1 },
-        { name: 'Tiger Slash', mana: 70, damage: 180, level: 35 },
-      ],
-    };
-    
-    const vocationSpells = spells[this.character.vocation] || spells.KNIGHT;
+    const vocationSpells = SPELLS[this.character.vocation] || SPELLS.KNIGHT;
+    const available = vocationSpells.filter(s => (s.type === 'attack' || s.type === 'aoe') && this.character.level >= s.level);
     // Retornar magia mais forte disponível baseado no nível
-    return vocationSpells.filter(s => this.character.level >= s.level).pop() || vocationSpells[0];
+    return available.pop() || { name: 'Exori', mana: 30, damage: 80, level: 1 };
   }
 
   // Obter todas as magias disponíveis para a vocação
   getAllSpells() {
-    const allSpells = {
-      KNIGHT: [
-        { name: 'Exura', mana: 20, heal: 50, level: 1, type: 'heal', description: 'Cura básica' },
-        { name: 'Exori', mana: 30, damage: 80, level: 1, type: 'attack', description: 'Golpe físico' },
-        { name: 'Exori Gran', mana: 60, damage: 150, level: 30, type: 'attack', description: 'Golpe forte' },
-        { name: 'Exori Mas', mana: 100, damage: 250, level: 50, type: 'attack', description: 'Golpe em área' },
-        { name: 'Exori Min', mana: 80, damage: 200, level: 40, type: 'attack', description: 'Golpe médio' },
-      ],
-      PALADIN: [
-        { name: 'Exura San', mana: 30, heal: 80, level: 20, type: 'heal', description: 'Cura sagrada' },
-        { name: 'Exori San', mana: 40, damage: 100, level: 1, type: 'attack', description: 'Tiro sagrado' },
-        { name: 'Exevo Mas San', mana: 80, damage: 200, level: 40, type: 'attack', description: 'Chuva de flechas' },
-        { name: 'Exori Con', mana: 60, damage: 160, level: 35, type: 'attack', description: 'Tiro concentrado' },
-      ],
-      SORCERER: [
-        { name: 'Exura Gran', mana: 40, heal: 120, level: 40, type: 'heal', description: 'Cura maior' },
-        { name: 'Exori Vis', mana: 40, damage: 120, level: 1, type: 'attack', description: 'Golpe de energia' },
-        { name: 'Exevo Mas Vis', mana: 100, damage: 280, level: 45, type: 'attack', description: 'Explosão de energia' },
-        { name: 'Exori Gran Vis', mana: 70, damage: 190, level: 38, type: 'attack', description: 'Golpe de energia forte' },
-        { name: 'Exori Flam', mana: 50, damage: 140, level: 25, type: 'attack', description: 'Golpe de fogo' },
-      ],
-      DRUID: [
-        { name: 'Exura Gran Mas Res', mana: 50, heal: 150, level: 50, type: 'heal', description: 'Cura ressurreição' },
-        { name: 'Exori Tera', mana: 40, damage: 110, level: 1, type: 'attack', description: 'Golpe de terra' },
-        { name: 'Exevo Mas Tera', mana: 100, damage: 260, level: 45, type: 'attack', description: 'Terremoto' },
-        { name: 'Exori Gran Tera', mana: 70, damage: 180, level: 38, type: 'attack', description: 'Golpe de terra forte' },
-        { name: 'Exori Frigo', mana: 50, damage: 130, level: 25, type: 'attack', description: 'Golpe de gelo' },
-      ],
-      MONK: [
-        { name: 'Healing Circle', mana: 35, heal: 100, level: 30, type: 'heal', description: 'Cura em círculo' },
-        { name: 'Chi Strike', mana: 35, damage: 90, level: 1, type: 'attack', description: 'Golpe de chi' },
-        { name: 'Tiger Slash', mana: 70, damage: 180, level: 35, type: 'attack', description: 'Golpe do tigre' },
-        { name: 'Dragon Fist', mana: 90, damage: 240, level: 50, type: 'attack', description: 'Punho do dragão' },
-        { name: 'Inner Focus', mana: 40, damage: 0, level: 20, type: 'buff', description: 'Aumenta dano' },
-      ],
-    };
-    
-    return allSpells[this.character.vocation] || allSpells.KNIGHT;
+    return SPELLS[this.character.vocation] || SPELLS.KNIGHT;
   }
 
   // Atualizar configurações
