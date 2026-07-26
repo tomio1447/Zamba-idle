@@ -170,7 +170,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
     // Nível
     ctx.fillStyle = '#FFD700';
     ctx.font = 'bold 11px "Segoe UI", sans-serif';
-    ctx.fillText(`Lv.${character.level}`, x, y - 30);
+    ctx.fillText('Lv.' + character.level, x, y - 30);
 
     // Barra de HP
     const hpWidth = 50;
@@ -288,12 +288,12 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 9px "Segoe UI", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`${boss.hp}/${boss.maxHp}`, x, y - 52);
+    ctx.fillText(boss.hp + '/' + boss.maxHp, x, y - 52);
 
     // Nome do boss
     ctx.fillStyle = '#FFD700';
     ctx.font = 'bold 14px "Segoe UI", sans-serif';
-    ctx.fillText(`👑 ${boss.name}`, x, y + 50);
+    ctx.fillText('👑 ' + boss.name, x, y + 50);
 
     // Texto BOSS
     ctx.fillStyle = '#ff0000';
@@ -316,16 +316,16 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
       triggerShake();
       
       if (result.killed) {
-        addCombatLog(`💀 ${result.monsterName} morreu! +${result.rewards?.xp || 0} XP`, 'kill');
+        addCombatLog('💀 ' + result.monsterName + ' morreu! +' + (result.rewards?.xp || 0) + ' XP', 'kill');
       } else {
-        addCombatLog(`⚔️ ${result.damage} dano em ${result.monsterName}`, 'damage');
+        addCombatLog('⚔️ ' + result.damage + ' dano em ' + result.monsterName, 'damage');
       }
 
       if (result.waveComplete) {
-        addCombatLog(`🌊 Wave completa!`, 'wave');
+        addCombatLog('🌊 Wave completa!', 'wave');
       }
     } catch (error) {
-      addCombatLog(`❌ ${error.message}`, 'error');
+      addCombatLog('❌ ' + error.message, 'error');
     }
   };
 
@@ -336,12 +336,12 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
       triggerShake();
       
       if (result.defeated) {
-        addCombatLog(`🏆 BOSS DERROTADO! +${result.rewards?.xp || 0} XP, +${result.rewards?.bossCoins || 0} Boss Coins!`, 'boss_kill');
+        addCombatLog('🏆 BOSS DERROTADO! +' + (result.rewards?.xp || 0) + ' XP, +' + (result.rewards?.bossCoins || 0) + ' Boss Coins!', 'boss_kill');
       } else {
-        addCombatLog(`⚔️ ${result.damage} dano no boss ${result.bossName}`, 'damage');
+        addCombatLog('⚔️ ' + result.damage + ' dano no boss ' + result.bossName, 'damage');
       }
     } catch (error) {
-      addCombatLog(`❌ ${error.message}`, 'error');
+      addCombatLog('❌ ' + error.message, 'error');
     }
   };
 
@@ -352,7 +352,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
         await onFlee();
         addCombatLog('🏃 Você fugiu da instância!', 'flee');
       } catch (error) {
-        addCombatLog(`❌ ${error.message}`, 'error');
+        addCombatLog('❌ ' + error.message, 'error');
       }
     }
   };
@@ -384,7 +384,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
   }
 
   return (
-    <div className={`game-canvas-container ${shakeScreen ? 'shake' : ''}`}>
+    <div className={'game-canvas-container ' + (shakeScreen ? 'shake' : '')}>
       {/* Indicador de carregamento de sprites */}
       {loadingSprites && (
         <div className="sprite-loading">
@@ -431,7 +431,7 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
       {/* Log de combate */}
       <div className="combat-log">
         {combatLog.slice(-5).map(log => (
-          <div key={log.id} className={`log-entry ${log.type}`}>
+          <div key={log.id} className={'log-entry ' + log.type}>
             {log.message}
           </div>
         ))}

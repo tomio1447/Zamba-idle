@@ -111,7 +111,7 @@ export default function Analyzers({ character, instance, isActive }) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    return h.toString().padStart(2, '0') + ':' + m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
   };
 
   // Calcular XP/hora
@@ -146,8 +146,8 @@ export default function Analyzers({ character, instance, isActive }) {
     const h = Math.floor(hours);
     const m = Math.floor((hours % 1) * 60);
     
-    if (h > 0) return `${h}h ${m}m`;
-    return `${m}m`;
+    if (h > 0) return h + 'h ' + m + 'm';
+    return m + 'm';
   };
 
   // Agrupar loot
@@ -179,7 +179,7 @@ export default function Analyzers({ character, instance, isActive }) {
         {TABS.map(tab => (
           <button
             key={tab.id}
-            className={`analyzer-tab ${activeTab === tab.id ? 'active' : ''}`}
+            className={'analyzer-tab ' + (activeTab === tab.id ? 'active' : '')}
             onClick={() => setActiveTab(tab.id)}
           >
             <span className="tab-icon">{tab.icon}</span>
@@ -289,7 +289,7 @@ export default function Analyzers({ character, instance, isActive }) {
                     <div className="skill-bar-container">
                       <div 
                         className="skill-bar" 
-                        style={{ width: `${Math.min(100, (value % 10)} * 100)}` }}
+                        style={{ width: Math.min(100, (value % 10) * 100) + '%' }}
                       ></div>
                     </div>
                     <div className="skill-gain">
@@ -334,7 +334,7 @@ export default function Analyzers({ character, instance, isActive }) {
                   <span>Valor</span>
                 </div>
                 {getLootSummary().map((item, idx) => (
-                  <div key={idx} className={`loot-row ${item.rare ? 'rare' : ''}`}>
+                  <div key={idx} className={'loot-row ' + (item.rare ? 'rare' : '')}>
                     <span className="loot-name">
                       {item.rare && '✨'} {item.name}
                     </span>
@@ -422,20 +422,20 @@ export default function Analyzers({ character, instance, isActive }) {
                 <p className="empty-message">Nenhum evento registrado</p>
               ) : (
                 combatLog.slice(-50).reverse().map(event => (
-                  <div key={event.id} className={`log-entry ${event.type}`}>
+                  <div key={event.id} className={'log-entry ' + event.type}>
                     <span className="log-time">
                       {new Date(event.timestamp).toLocaleTimeString()}
                     </span>
                     <span className="log-message">
-                      {event.type === 'kill' && `💀 ${event.data.monsterName} morto`}
-                      {event.type === 'xp' && `✨ +${event.data.amount} XP`}
-                      {event.type === 'gold' && `💰 +${event.data.amount} Gold`}
-                      {event.type === 'loot' && `🎒 ${event.data.name} x${event.data.quantity}`}
-                      {event.type === 'skill' && `📈 ${event.data.skillName} +${event.data.amount}`}
-                      {event.type === 'damage_dealt' && `⚔️ ${event.data.amount} dano`}
-                      {event.type === 'damage_taken' && `🩸 ${event.data.amount} dano`}
-                      {event.type === 'death' && `💀 Você morreu`}
-                      {event.type === 'boss_kill' && `👑 Boss ${event.data.bossName} derrotado`}
+                      {event.type === 'kill' && '💀 ' + event.data.monsterName + ' morto'}
+                      {event.type === 'xp' && '✨ +' + event.data.amount + ' XP'}
+                      {event.type === 'gold' && '💰 +' + event.data.amount + ' Gold'}
+                      {event.type === 'loot' && '🎒 ' + event.data.name + ' x' + event.data.quantity}
+                      {event.type === 'skill' && '📈 ' + event.data.skillName + ' +' + event.data.amount}
+                      {event.type === 'damage_dealt' && '⚔️ ' + event.data.amount + ' dano'}
+                      {event.type === 'damage_taken' && '🩸 ' + event.data.amount + ' dano'}
+                      {event.type === 'death' && '💀 Você morreu'}
+                      {event.type === 'boss_kill' && '👑 Boss ' + event.data.bossName + ' derrotado'}
                     </span>
                   </div>
                 ))

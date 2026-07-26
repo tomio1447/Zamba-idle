@@ -32,7 +32,7 @@ export default function SpriteUploader({ onSpritesLoaded }) {
         setStatus('❌ Erro ao carregar. Verifique se os arquivos estão em /sprites/');
       }
     } catch (error) {
-      setStatus(`❌ Erro: ${error.message}`);
+      setStatus('❌ Erro: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -69,7 +69,7 @@ export default function SpriteUploader({ onSpritesLoaded }) {
       const catalog = JSON.parse(catalogText);
       
       setProgress(40);
-      setStatus(`Catálogo carregado: ${catalog.length} arquivos`);
+      setStatus('Catálogo carregado: ' + catalog.length + ' arquivos');
 
       // Carregar spritesheets
       const spriteFiles = catalog.filter(entry => 
@@ -104,12 +104,12 @@ export default function SpriteUploader({ onSpritesLoaded }) {
 
       setProgress(100);
       loader.loaded = true;
-      setStatus(`✅ Carregado! ${loaded} spritesheets, ${catalog.length} entradas`);
+      setStatus('✅ Carregado! ' + loaded + ' spritesheets, ' + catalog.length + ' entradas');
       setLoaded(true);
       onSpritesLoaded(true);
 
     } catch (error) {
-      setStatus(`❌ Erro: ${error.message}`);
+      setStatus('❌ Erro: ' + error.message);
     } finally {
       setLoading(false);
     }
