@@ -254,3 +254,60 @@ Depois de rodar o MVP, você pode:
 ---
 
 **Divirta-se jogando! 🎮⚔️**
+
+---
+
+## 🖼️ Carregando Sprites Reais do Tibia (Canary + OTClient + 15.x Assets)
+
+Agora o Zamba Idle suporta **os assets oficiais** que você indicou:
+
+### Repositórios usados como base:
+
+- **Servidor**: https://github.com/opentibiabr/canary
+- **Cliente**: https://github.com/opentibiabr/otclient
+- **Sprites / Outfits / Effects / Missiles**: https://github.com/Levi999x/15.x-with-8.60
+
+### Como instalar os sprites rapidamente
+
+**Opção A - Script automático (recomendado):**
+
+```bash
+cd Zamba-idle
+./scripts/setup-assets.sh
+```
+
+**Opção B - Manual:**
+
+```bash
+# 1. Baixe os assets
+git clone --depth 1 https://github.com/Levi999x/15.x-with-8.60.git /tmp/tibia-15x
+
+# 2. Extraia
+cd /tmp/tibia-15x
+unzip -o Tibia_spr_dat.zip -d extracted/
+
+# 3. Copie para o projeto
+mkdir -p frontend/public/assets/tibia-860
+cp extracted/Tibia.spr extracted/Tibia.dat frontend/public/assets/tibia-860/
+cp *.xml Tibia.otfi frontend/public/assets/tibia-860/ 2>/dev/null || true
+
+# 4. (opcional) copie também para a pasta antiga
+cp frontend/public/assets/tibia-860/* frontend/public/sprites/ 2>/dev/null || true
+```
+
+### Como usar dentro do jogo
+
+1. Rode `npm run dev` no frontend
+2. Crie um personagem e entre em uma caçada
+3. No painel "Campo de Batalha", clique no botão **"🎨 Sprites"**
+4. Clique em **"📁 Carregar de /sprites/"**
+
+O sistema tenta primeiro `/assets/tibia-860/` (formato clássico OT) e depois o formato moderno.
+
+### Formatos suportados
+
+- **Recomendado**: `Tibia.spr` + `Tibia.dat` (compatível com OTClient)
+- Moderno: `catalog-content.json` + spritesheets .lzma
+
+Depois de carregar os sprites, os monstros e personagens usarão as imagens reais do client!
+

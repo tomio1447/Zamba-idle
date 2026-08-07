@@ -12,24 +12,24 @@ export default function TibiaGameCanvas({ character, instance, onAttack, onAttac
   const [shakeScreen, setShakeScreen] = useState(false);
   const [loadingSprites, setLoadingSprites] = useState(true);
 
-  // Carregar sprites do client Tibia
+  // Carregar sprites do client Tibia (otclient + 15.x-with-8.60)
   useEffect(() => {
     const loader = getModernSpriteLoader();
     
-    // Tentar carregar dos arquivos locais
-    loader.loadFromDirectory('/sprites/')
-      .then(success => {
-        if (success) {
-          setSpritesLoaded(true);
-          setLoadingSprites(false);
-        } else {
-          // Se não conseguir carregar, usar fallback visual
-          setLoadingSprites(false);
-        }
-      })
-      .catch(() => {
-        setLoadingSprites(false);
-      });
+    // Tenta primeiro o caminho oficial recomendado
+    const tryLoad = async () => {
+      let ok = await loader.loadFromDirectory('/assets/tibia-860/');
+      if (!ok) {
+        ok = await loader.loadFromDirectory('/sprites/');
+      }
+      if (ok) {
+        setSpritesLoaded(true);
+        console.log('🎨 Sprites carregados:', loader.getFormat?.());
+      }
+      setLoadingSprites(false);
+    };
+    
+    tryLoad().catch(() => setLoadingSprites(false));
   }, []);
 
   // Adicionar ao log de combate

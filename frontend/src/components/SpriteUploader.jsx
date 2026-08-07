@@ -8,28 +8,35 @@ export default function SpriteUploader({ onSpritesLoaded }) {
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef(null);
 
-  // Carregar de diretório local (public/sprites/)
+  // Carregar de diretório local (public/sprites/ ou /assets/tibia-860/)
   async function handleLoadFromPublic() {
     setLoading(true);
-    setStatus('Carregando do diretório /sprites/...');
+    setStatus('Procurando assets do Tibia...');
     setProgress(10);
 
     try {
       const loader = getModernSpriteLoader();
       
-      // Carregar catálogo
-      setStatus('Carregando catálogo...');
-      setProgress(30);
-      
-      const success = await loader.loadFromDirectory('/sprites/');
-      
+      // Tenta primeiro o novo caminho recomendado (otclient + 15.x-with-8.60)
+      setStatus('Tentando carregar de /assets/tibia-860/...');
+      setProgress(20);
+      let success = await loader.loadFromDirectory('/assets/tibia-860/');
+
+      if (!success) {
+        // Fallback antigo
+        setStatus('Tentando /sprites/...');
+        setProgress(40);
+        success = await loader.loadFromDirectory('/sprites/');
+      }
+
       if (success) {
         setProgress(100);
-        setStatus('✅ Sprites carregados com sucesso!');
+        const fmt = loader.getFormat ? loader.getFormat() : 'unknown';
+        setStatus(`✅ Assets carregados! (${fmt})`);
         setLoaded(true);
         onSpritesLoaded(true);
       } else {
-        setStatus('❌ Erro ao carregar. Verifique se os arquivos estão em /sprites/');
+        setStatus('❌ Nenhum asset encontrado. Coloque Tibia.spr + Tibia.dat em /assets/tibia-860/');
       }
     } catch (error) {
       setStatus('❌ Erro: ' + error.message);
@@ -45,7 +52,7 @@ export default function SpriteUploader({ onSpritesLoaded }) {
 
     setLoading(true);
     setStatus('Processando arquivos...');
-    setProgress(0);
+    setProgress(10);
 
     try {
       const fileMap = {};
@@ -53,47 +60,66 @@ export default function SpriteUploader({ onSpritesLoaded }) {
         fileMap[file.name.toLowerCase()] = file;
       }
 
-      // Verificar arquivos necessários
+      const loader = getModernSpriteLoader();
+
+      // Detecta formato clássico OT (Tibia.spr + Tibia.dat) - recomendado com otclient
+      const sprFile = fileMap['tibia.spr'];
+      const datFile = fileMap['tibia.dat'];
+
+      if (sprFile && datFile) {
+        setStatus('Carregando formato clássico (Tibia.spr + Tibia.dat)...');
+        setProgress(30);
+
+        const success = await loader.loadClassicFromFiles 
+          ? await loader.loadClassicFromFiles(sprFile, datFile)
+          : await loader.loadFromFiles(files); // fallback
+
+        if (success) {
+          setProgress(100);
+          setStatus('✅ Assets clássicos 8.60/15.x carregados com sucesso!');
+          setLoaded(true);
+          onSpritesLoaded(true);
+          return;
+        }
+      }
+
+      // Formato moderno
       const catalogFile = fileMap['catalog-content.json'];
       if (!catalogFile) {
-        setStatus('❌ catalog-content.json não encontrado!');
+        setStatus('❌ Selecione Tibia.spr + Tibia.dat (clássico) OU catalog-content.json (moderno)');
         setLoading(false);
         return;
       }
 
-      setProgress(20);
-      setStatus('Carregando catálogo...');
+      setProgress(25);
+      setStatus('Carregando catálogo moderno...');
 
-      // Ler catálogo
       const catalogText = await catalogFile.text();
       const catalog = JSON.parse(catalogText);
       
       setProgress(40);
       setStatus('Catálogo carregado: ' + catalog.length + ' arquivos');
 
-      // Carregar spritesheets
       const spriteFiles = catalog.filter(entry => 
         entry.type === 'sprite' || entry.name?.includes('sprites-')
       );
 
-      const loader = getModernSpriteLoader();
       loader.catalog = catalog;
       loader.spriteSheets = new Map();
 
-      let loaded = 0;
+      let loadedCount = 0;
       for (const entry of spriteFiles) {
-        const fileName = entry.file?.toLowerCase() || entry.name?.toLowerCase();
+        const fileName = (entry.file || entry.name || '').toLowerCase();
         const file = fileMap[fileName];
         
         if (file) {
           const data = await file.arrayBuffer();
-          loader.spriteSheets.set(entry.id || loaded, data);
-          loaded++;
-          setProgress(40 + (loaded / spriteFiles.length) * 40);
+          loader.spriteSheets.set(entry.id || loadedCount, data);
+          loadedCount++;
+          setProgress(40 + (loadedCount / spriteFiles.length) * 45);
         }
       }
 
-      // Carregar appearances
       const appearancesFile = Object.keys(fileMap).find(name => 
         name.startsWith('appearances-') || name === 'appearances.dat'
       );
@@ -104,7 +130,8 @@ export default function SpriteUploader({ onSpritesLoaded }) {
 
       setProgress(100);
       loader.loaded = true;
-      setStatus('✅ Carregado! ' + loaded + ' spritesheets, ' + catalog.length + ' entradas');
+      loader.format = 'modern';
+      setStatus(`✅ Moderno carregado! ${loadedCount} spritesheets`);
       setLoaded(true);
       onSpritesLoaded(true);
 
@@ -118,8 +145,8 @@ export default function SpriteUploader({ onSpritesLoaded }) {
   return (
     <div className="sprite-uploader">
       <div className="uploader-header">
-        <h3>🎮 Sprites do Tibia 15.25</h3>
-        <p>Carregue os arquivos do client moderno (dudantas/tibia-client)</p>
+        <h3>🎮 Sprites do Tibia (OTClient + Canary)</h3>
+        <p>Carregue assets do <strong>opentibiabr/otclient</strong> + <strong>15.x-with-8.60</strong></p>
       </div>
 
       <div className="uploader-options">
@@ -147,7 +174,7 @@ export default function SpriteUploader({ onSpritesLoaded }) {
               onChange={handleFileSelect}
               ref={fileInputRef}
               style={{ display: 'none' }}
-              accept=".json,.dat,.lzma,.bmp"
+              accept=".spr,.dat,.json,.lzma,.bmp"
             />
           </label>
           <small>Selecione os arquivos do client (catalog-content.json, sprites-*.bmp.lzma, appearances-*.dat)</small>

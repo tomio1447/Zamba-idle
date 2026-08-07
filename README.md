@@ -55,9 +55,10 @@ Inspirado no BaiakIdle, o Zamba Idle é um jogo RPG idle onde seu personagem ca�
 - **Express** - Framework web
 - **Armazenamento em memória** (MVP) - Futuramente conectado ao Canary
 
-### Engine (Futuro)
-- **Canary Server** (OpenTibiaBR) - Servidor TFS para o jogo completo
-- **Sprites**: Tibia Client 15.25 ([dudantas/tibia-client](https://github.com/dudantas/tibia-client/releases/tag/15.25.0a00a0))
+### Engine & Assets (Base Oficial)
+- **Canary Server** — [opentibiabr/canary](https://github.com/opentibiabr/canary) (lógica completa: spells, monsters, items, vocations)
+- **Cliente** — [opentibiabr/otclient](https://github.com/opentibiabr/otclient) (render engine OTCv8)
+- **Sprites / Outfits / Effects / Missiles** — [Levi999x/15.x-with-8.60](https://github.com/Levi999x/15.x-with-8.60) (downgraded 15.x assets compatíveis com 8.60)
 
 ## 🚀 Como Executar
 
@@ -180,18 +181,19 @@ Zamba-idle/
 
 ## 🔮 Futuras Implementações
 
+- [x] **Sprites reais do Tibia** — Suporte a Tibia.spr + Tibia.dat (otclient + 15.x-with-8.60)
 - [ ] **Conexão com Canary Server** - Integração real com o servidor TFS
 - [ ] **Sistema de Party** - Caçada em grupo com bônus de XP
 - [ ] **Sistema de Equipamento** - Armas, armas e acessórios
-- [ ] **Magias** - Spells e runas
+- [ ] **Magias visuais** - Efeitos e missiles reais usando assets do OTClient
 - [ ] **Tasks** - Missões de caçada com recompensas
 - [ ] **Market** - Comércio entre jogadores
 - [ ] **Imbuements** - Melhorias de equipamento
 - [ ] **Addons** - Customização visual
-- [ ] **Outfits** - Roupas cosméticas
+- [ ] **Outfits** - Roupas cosméticas completas (direções + addons)
 - [ ] **Autenticação** - Sistema de contas real
 - [ ] **Banco de Dados** - Persistência com MySQL/PostgreSQL
-- [ ] **Sprites reais do Tibia** - Renderizar sprites do client 15.25
+- [ ] **Efeitos & Missiles** - Animações reais do client 15.x/8.60
 
 ## 📄 Licença
 
@@ -199,7 +201,10 @@ Este projeto é um fã-game não oficial, não afiliado à CipSoft GmbH. Tibia �
 
 ## 🙏 Créditos
 
-- **Canary Server** - [OpenTibiaBR](https://github.com/opentibiabr/canary)
-- **Tibia Client** - [dudantas/tibia-client](https://github.com/dudantas/tibia-client)
-- **Inspiração** - BaiakIdle
-- **Comunidade OpenTibia** - Por manter o Tibia vivo
+- **Servidor** — [opentibiabr/canary](https://github.com/opentibiabr/canary)
+- **Cliente** — [opentibiabr/otclient](https://github.com/opentibiabr/otclient)
+- **Assets (sprites/outfits/effects/missiles)** — [Levi999x/15.x-with-8.60](https://github.com/Levi999x/15.x-with-8.60)
+- **Inspiração** — BaiakIdle
+- **Comunidade OpenTibia** — Por manter o Tibia vivo
+
+**Base completa do jogo**: Canary + OTClient + Assets 15.x/8.60 (como você pediu)

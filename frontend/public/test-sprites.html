@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Zamba Idle - Teste de Sprites (Canary + OTClient)</title>
+  <style>
+    :root {
+      --bg: #1a1a22;
+      --panel: #25252f;
+      --accent: #e8c34e;
+      --text: #eae8e2;
+      --dim: #888;
+    }
+    body {
+      font-family: system-ui, Segoe UI, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.4;
+    }
+    h1 { color: var(--accent); margin-top: 0; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .status {
+      background: var(--panel);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      border: 1px solid #444;
+    }
+    .status.loaded { border-color: #4ade80; color: #4ade80; }
+    .status.error { border-color: #f87171; color: #f87171; }
+    
+    .controls {
+      background: var(--panel);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    button {
+      background: #3a3a46;
+      color: white;
+      border: 1px solid #555;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.1s;
+    }
+    button:hover { background: #4a4a58; border-color: var(--accent); }
+    button.primary { background: var(--accent); color: #111; }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 12px;
+      background: var(--panel);
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .sprite-cell {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 8px;
+      text-align: center;
+      font-size: 11px;
+    }
+    .sprite-cell canvas {
+      image-rendering: pixelated;
+      border: 1px solid #222;
+      background: #1a1a22;
+      margin-bottom: 4px;
+    }
+    .sprite-label {
+      color: #aaa;
+      font-size: 10px;
+      word-break: break-all;
+    }
+    
+    .info {
+      background: #222;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .log {
+      background: #111;
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .section-title {
+      color: var(--accent);
+      font-size: 15px;
+      margin: 20px 0 8px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 Teste de Sprites - Zamba Idle</h1>
+      <div>
+        <span class="status" id="status">Aguardando...</span>
+      </div>
+    </div>
+
+    <div class="info">
+      <strong>Base oficial:</strong> 
+      <a href="https://github.com/opentibiabr/canary" target="_blank">Canary</a> + 
+      <a href="https://github.com/opentibiabr/otclient" target="_blank">OTClient</a> + 
+      <a href="https://github.com/Levi999x/15.x-with-8.60" target="_blank">15.x-with-8.60</a>
+      <br>
+      <small>Coloque <code>Tibia.spr</code> + <code>Tibia.dat</code> em <code>/assets/tibia-860/</code> ou faça upload abaixo.</small>
+    </div>
+
+    <div class="controls">
+      <button onclick="loadFromAssets()" class="primary">📁 Carregar de /assets/tibia-860/</button>
+      <button onclick="loadFromSprites()">📁 Tentar /sprites/</button>
+      
+      <label style="margin-left: 12px; cursor: pointer;">
+        <input type="file" id="sprFile" accept=".spr" style="display:none" onchange="handleClassicUpload()">
+        <button onclick="document.getElementById('sprFile').click()">📤 Upload Tibia.spr</button>
+      </label>
+      
+      <label style="cursor: pointer;">
+        <input type="file" id="datFile" accept=".dat" style="display:none" onchange="handleClassicUpload()">
+        <button onclick="document.getElementById('datFile').click()">📤 Upload Tibia.dat</button>
+      </label>
+
+      <button onclick="clearCache()">🗑️ Limpar Cache</button>
+      <button onclick="window.location.href='/'">← Voltar ao Jogo</button>
+    </div>
+
+    <div id="formatInfo" style="margin-bottom:12px; font-size:13px; color:#888;"></div>
+
+    <!-- VOCAÇÕES -->
+    <div class="section-title">👤 Outfits por Vocação (IDs do OTClient)</div>
+    <div class="grid" id="vocations"></div>
+
+    <!-- MONSTROS -->
+    <div class="section-title">👾 Monstros Comuns</div>
+    <div class="grid" id="monsters"></div>
+
+    <!-- BOSSES -->
+    <div class="section-title">👑 Bosses</div>
+    <div class="grid" id="bosses"></div>
+
+    <div class="section-title">📋 Log</div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    // =====================================================
+    // SPRITE LOADER SIMPLIFICADO (mesma lógica do projeto)
+    // =====================================================
+    let sprData = null;
+    let datData = null;
+    let spriteCache = new Map();
+    let currentFormat = 'none';
+
+    function log(msg, type = 'info') {
+      const logEl = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      const color = type === 'success' ? '#4ade80' : type === 'error' ? '#f87171' : '#aaa';
+      logEl.innerHTML += `<span style="color:${color}">[${time}] ${msg}</span>\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function updateStatus(text, isLoaded = false, isError = false) {
+      const el = document.getElementById('status');
+      el.textContent = text;
+      el.className = 'status';
+      if (isLoaded) el.classList.add('loaded');
+      if (isError) el.classList.add('error');
+    }
+
+    function updateFormatInfo() {
+      const el = document.getElementById('formatInfo');
+      if (currentFormat === 'classic') {
+        el.innerHTML = `✅ <strong>Formato Clássico</strong> (Tibia.spr + Tibia.dat) — compatível com OTClient`;
+      } else if (currentFormat === 'modern') {
+        el.innerHTML = `✅ <strong>Formato Moderno 15.x</strong>`;
+      } else {
+        el.innerHTML = `⚠️ Nenhum asset carregado. Usando fallback visual.`;
+      }
+    }
+
+    async function fetchArrayBuffer(url) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.arrayBuffer();
+    }
+
+    async function loadClassicFromPath(basePath) {
+      log(`Tentando carregar Tibia.spr + Tibia.dat de ${basePath}...`);
+      
+      try {
+        const [spr, dat] = await Promise.all([
+          fetchArrayBuffer(`${basePath}Tibia.spr`),
+          fetchArrayBuffer(`${basePath}Tibia.dat`)
+        ]);
+        
+        sprData = spr;
+        datData = dat;
+        currentFormat = 'classic';
+        spriteCache.clear();
+        
+        updateStatus('✅ Assets clássicos carregados', true);
+        log(`Tibia.spr: ${(spr.byteLength/1024/1024).toFixed(1)} MB | Tibia.dat: ${(dat.byteLength/1024).toFixed(0)} KB`, 'success');
+        updateFormatInfo();
+        
+        return true;
+      } catch (e) {
+        log(`Falha ao carregar de ${basePath}: ${e.message}`, 'error');
+        return false;
+      }
+    }
+
+    async function loadFromAssets() {
+      const success = await loadClassicFromPath('/assets/tibia-860/');
+      if (success) {
+        await renderAllSprites();
+      } else {
+        const fallback = await loadClassicFromPath('/sprites/');
+        if (fallback) await renderAllSprites();
+      }
+    }
+
+    async function loadFromSprites() {
+      const success = await loadClassicFromPath('/sprites/');
+      if (success) await renderAllSprites();
+    }
+
+    async function handleClassicUpload() {
+      const sprInput = document.getElementById('sprFile');
+      const datInput = document.getElementById('datFile');
+      
+      const sprFile = sprInput.files[0];
+      const datFile = datInput.files[0];
+      
+      if (!sprFile || !datFile) {
+        log('Selecione ambos Tibia.spr e Tibia.dat', 'error');
+        return;
+      }
+      
+      try {
+        log('Lendo arquivos enviados...');
+        const [sprBuf, datBuf] = await Promise.all([
+          sprFile.arrayBuffer(),
+          datFile.arrayBuffer()
+        ]);
+        
+        sprData = sprBuf;
+        datData = datBuf;
+        currentFormat = 'classic';
+        spriteCache.clear();
+        
+        updateStatus('✅ Upload clássico carregado', true);
+        log(`Carregado: ${sprFile.name} + ${datFile.name}`, 'success');
+        updateFormatInfo();
+        
+        await renderAllSprites();
+      } catch (err) {
+        log('Erro ao ler arquivos: ' + err.message, 'error');
+      }
+    }
+
+    function clearCache() {
+      spriteCache.clear();
+      log('Cache limpo');
+      renderAllSprites();
+    }
+
+    // =====================================================
+    // RENDERIZAÇÃO DE SPRITES (com fallback visual)
+    // =====================================================
+    async function getOrCreateSpriteImage(spriteId, label) {
+      if (spriteCache.has(spriteId)) {
+        return spriteCache.get(spriteId);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 48;
+      canvas.height = 48;
+      const ctx = canvas.getContext('2d');
+
+      // Fallback visual sempre funciona
+      const hue = (spriteId * 11) % 360;
+      ctx.fillStyle = `hsl(${hue}, 70%, 42%)`;
+      ctx.fillRect(0, 0, 48, 48);
+      
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(2, 2, 44, 44);
+
+      // Simula um "sprite" simples
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillRect(10, 10, 28, 28);
+
+      // Texto do ID
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(String(spriteId), 24, 42);
+
+      const img = new Image();
+      img.src = canvas.toDataURL();
+      
+      // Tenta extrair do arquivo real se disponível (placeholder)
+      if (currentFormat === 'classic' && sprData) {
+        // NOTA: Parser completo de .spr é avançado.
+        // Por enquanto mostramos o fallback colorido + ID
+        // (o real seria extraído do arquivo .spr)
+      }
+
+      spriteCache.set(spriteId, img);
+      return img;
+    }
+
+    async function renderSpriteGrid(containerId, sprites) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+
+      for (const [name, id] of Object.entries(sprites)) {
+        const cell = document.createElement('div');
+        cell.className = 'sprite-cell';
+        
+        const img = await getOrCreateSpriteImage(id, name);
+        
+        const c = document.createElement('canvas');
+        c.width = 48;
+        c.height = 48;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        
+        cell.innerHTML = `
+          <div>${c.outerHTML}</div>
+          <div class="sprite-label">${name}<br><small style="opacity:0.6">#${id}</small></div>
+        `;
+        
+        container.appendChild(cell);
+      }
+    }
+
+    async function renderAllSprites() {
+      log('Renderizando sprites...');
+      
+      // Vocations
+      await renderSpriteGrid('vocations', {
+        'Knight': 131,
+        'Paladin': 129,
+        'Sorcerer': 130,
+        'Druid': 136,
+        'Monk': 152,
+        'Citizen': 128
+      });
+
+      // Monsters
+      await renderSpriteGrid('monsters', {
+        'Rat': 282,
+        'Spider': 218,
+        'Bear': 219,
+        'Ghoul': 320,
+        'Demon': 35,
+        'Frost Dragon': 34,
+        'Scorpion': 324,
+        'Necromancer': 220
+      });
+
+      // Bosses
+      await renderSpriteGrid('bosses', {
+        'Spider Queen': 218,
+        'Bear Spirit': 219,
+        'Necromancer Lord': 220,
+        'Pharaoh Anubis': 325,
+        'Frost Dragon Lord': 34,
+        'Demon Overlord': 35
+      });
+      
+      log('Sprites renderizados (com fallback visual)', 'success');
+    }
+
+    // =====================================================
+    // INICIALIZAÇÃO
+    // =====================================================
+    async function init() {
+      log('Página de teste de sprites iniciada');
+      updateStatus('Pronto para carregar assets');
+      updateFormatInfo();
+      
+      // Renderiza fallback imediatamente
+      await renderAllSprites();
+      
+      // Tenta carregar automaticamente os assets
+      setTimeout(async () => {
+        log('Tentando carregamento automático...');
+        const success = await loadClassicFromPath('/assets/tibia-860/');
+        if (success) {
+          await renderAllSprites();
+        } else {
+          log('Nenhum asset clássico encontrado automaticamente. Use upload ou coloque os arquivos na pasta.', 'info');
+        }
+      }, 600);
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

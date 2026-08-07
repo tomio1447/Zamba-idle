@@ -1,0 +1,7 @@
+# Place Tibia.spr and Tibia.dat here
+# Also recommended: outfits.xml, items.xml, Tibia.otfi
+
+# How to get them:
+# git clone https://github.com/Levi999x/15.x-with-8.60.git
+# unzip Tibia_spr_dat.zip
+# cp extracted/Tibia.* ./
